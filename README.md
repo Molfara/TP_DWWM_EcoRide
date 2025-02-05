@@ -4,7 +4,7 @@ Projet pédagogique de développement de la plateforme de covoiturage EcoRide.
 ## Début d'un projet
 
 ### 1. Configuration de PHP et MySQL :
-- PHP 8.4.2;
+- PHP 8.4.2 ;
 - MySQL  Ver 9.1.0 for macos14 on arm64.
 
 ### 2. Création d'un repo TP_DWWM_EcoRide sur GitHub.
@@ -20,7 +20,15 @@ Projet pédagogique de développement de la plateforme de covoiturage EcoRide.
 - Les dossiers : `public`, `src`, `config`
 - Les fichiers : `public/index.php`, `config/database.php`, `.env`.
 
-### 7. Création de la database TP_DWWM_EcoRide à MySQL;
+### 7. Création de la BD TP_DWWM_EcoRide à MySQL via phpMyAdmin.
+
+### 8. Création de la table "users" dans la base de données TP_DWWM_EcoRide.
+
+### 9. Démarrage du premier script PHP " Bienvenue dans EcoRide ! " :
+
+- Ajout du code avec " Bienvenue dans EcoRide! " dans public/index.php via VS Code ;
+- Lancement du serveur localhost:8080 ;
+- Vérification de la page http://localhost:8080 dans le navigateur.
 
 ## Description des dossiers et fichiers :
 - **/public** : Ce dossier contient les fichiers accessibles aux utilisateurs via le navigateur. Il comprend le fichier `index.php`, qui est le point d'entrée pour toutes les requêtes HTTP.
