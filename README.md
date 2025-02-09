@@ -1,7 +1,7 @@
 # TP_DWWM_EcoRide
 Projet pédagogique de développement de la plateforme de covoiturage EcoRide.
 
-## Début d'un projet
+## Début de projet
 
 ### 1. Configuration de PHP et MySQL :
 - PHP 8.4.2 ;
@@ -29,6 +29,22 @@ Projet pédagogique de développement de la plateforme de covoiturage EcoRide.
 - Ajout du code avec " Bienvenue dans EcoRide! " dans public/index.php via VS Code ;
 - Lancement du serveur localhost:8080 ;
 - Vérification de la page http://localhost:8080 dans le navigateur.
+
+### 10. Routage
+
+Le fichier `public/index.php` gère le routage des pages du site :
+
+'' => 'pages/accueil.php',
+    'covoiturage' => 'pages/covoiturage.php',
+    'connection' => 'pages/connection.php',
+    'contact' => 'pages/contact.php'
+];
+
+if (array_key_exists($request, $routes)) {
+    require __DIR__ . '/../' . $routes[$request];
+} else {
+    http_response_code(404);
+    echo "Page non trouvée.";
 
 ## Description des dossiers et fichiers :
 - **/public** : Ce dossier contient les fichiers accessibles aux utilisateurs via le navigateur. Il comprend le fichier `index.php`, qui est le point d'entrée pour toutes les requêtes HTTP.
