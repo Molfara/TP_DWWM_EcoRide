@@ -1,5 +1,6 @@
-
 <?php
+require 'header.php'; // Inclusion de l'en-tête
+
 $request = trim($_SERVER['REQUEST_URI'], '/');
 
 $routes = [
