@@ -1,0 +1,43 @@
+/* Style général du header */
+header {
+    display: flex; /* Affichage en ligne avec flexbox */
+    justify-content: space-between; /* Espacement entre le logo et le menu */
+    align-items: center; /* Alignement vertical des éléments */
+    padding: 10px 20px; /* Espacement interne */
+    background: #fff; /* Fond blanc */
+    border-bottom: 2px solid #ddd; /* Bordure grise en bas du header */
+}
+
+/* Style du logo */
+.logo img {
+    height: 100px; /* Hauteur du logo */
+    width: auto;
+}
+
+/* Style du menu de navigation */
+nav ul {
+    list-style: none; /* Suppression des puces de la liste */
+    display: flex; /* Affichage en ligne des éléments */
+    gap: 20px; /* Espacement entre les liens */
+    padding: 0; /* Suppression du padding */
+    margin: 0; /* Suppression des marges */
+}
+
+/* Style des éléments du menu */
+nav ul li {
+    display: inline; /* Affichage en ligne */
+}
+
+/* Style des liens du menu */
+nav ul li a {
+    text-decoration: none; /* Suppression du soulignement */
+    color: #333; /* Couleur du texte */
+    font-weight: bold; /* Texte en gras */
+    transition: color 0.3s; /* Effet de transition sur la couleur */
+}
+
+/* Changement de couleur au survol des liens */
+nav ul li a:hover {
+    color: #007bff; /* Bleu lors du survol */
+}
+
