@@ -87,6 +87,28 @@ nav ul {
 }
 ```
 
+# Déploiement sur Heroku
+
+## Application : `studiecoride`
+
+### URL déployée : [studiecoride](https://studiecoride-cd8de33217d4.herokuapp.com/)
+
+## Étapes de déploiement
+
+1. **Connexion à Heroku**
+
+2. **Ajout du remote Heroku** 
+
+3. **Ajout et commit des modifications**
+
+4. **Push sur la branche `main`**
+   
+5. **Déploiement sur Heroku**
+
+6. **Accès à l'application**
+    Ouvrir [https://studiecoride-cd8de33217d4.herokuapp.com/](https://studiecoride-cd8de33217d4.herokuapp.com/) dans un navigateur.
+
+
 
 
 
