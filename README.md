@@ -108,6 +108,67 @@ nav ul {
 6. **Accès à l'application**
     Ouvrir [https://studiecoride-cd8de33217d4.herokuapp.com/](https://studiecoride-cd8de33217d4.herokuapp.com/) dans un navigateur.
 
+# Structure de la Base de Données EcoRide
+
+## Description
+Ce projet contient la structure de la base de données pour l'application de covoiturage écologique EcoRide. La base de données gère les utilisateurs, les voitures, les trajets et les systèmes de notation.
+
+## Structure
+
+### Tables Principales
+* `utilisateur` - Gestion des utilisateurs
+* `voiture` - Informations sur les véhicules
+* `covoiturage` - Détails des trajets
+* `avis` - Système de notation et commentaires
+
+### Tables de Référence
+* `role` - Gestion des rôles utilisateurs
+* `marque` - Marques de voitures
+* `parametre` - Paramètres système
+* `configuration` - Configuration système
+
+### Vues (Views)
+* `disponible_covoiturages` - Affichage des trajets disponibles
+* `conducteur_ratings` - Notation moyenne des conducteurs
+* `eco_covoiturages` - Liste des trajets écologiques
+
+### Déclencheurs (Triggers)
+* `tr_credits_nouvel_utilisateur` - Attribution des crédits initiaux
+* `tr_reservation_covoiturage` - Gestion des crédits lors des réservations
+* `tr_confirmation_covoiturage` - Attribution des crédits après trajet
+
+## Installation
+
+1. Créer la base de données :
+    ```sql
+    CREATE DATABASE DB_EcoRide CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    ```
+
+2. Importer le schéma :
+    ```bash
+    mysql -u root -p DB_EcoRide < database/schema.sql
+    ```
+
+## Développement
+
+Pour contribuer au développement de la base de données :
+
+1. Créer une nouvelle branche :
+    ```bash
+    git checkout -b feature/database-structure
+    ```
+
+2. Exporter les modifications :
+    ```bash
+    mysqldump -u root -p DB_EcoRide > database/schema.sql
+    ```
+
+3. Commiter les changements :
+    ```bash
+    git add database/schema.sql
+    git commit -m "feat: ajout de la structure de la base de données avec tables, index, vues et déclencheurs"
+    git push origin feature/database-structure
+    ```
 
 
 
