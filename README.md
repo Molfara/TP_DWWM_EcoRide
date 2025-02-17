@@ -3,34 +3,41 @@ Projet pédagogique de développement de la plateforme de covoiturage EcoRide.
 
 ## Début de projet
 
-### 1. Configuration de PHP et MySQL :
+### 1. Configuration de PHP, MySQL et MongoDB :
 - PHP 8.4.2 ;
 - MySQL  Ver 9.1.0 for macos14 on arm64.
+- MongoDB v8.0.4
 
-### 2. Création d'un repo TP_DWWM_EcoRide sur GitHub.
+### 2. Installation de Bootstrap.
 
-### 3. Ajout d'une branche "develop".
+### 3. Création d'un repo TP_DWWM_EcoRide sur GitHub.
 
-### 4. Clonage d'un repo dans un dossier local.
+### 4. Ajout d'une branche "develop".
 
-### 5. Installation de VS Code et Copilot.
+### 5. Début de la documentation des étapes de développement dans le README.md sur GitHub.
 
-### 6. Création de la structure du projet :
+### 6. Clonage d'un repo dans un dossier local.
+
+### 7. Installation de VS Code et Copilot.
+
+### 8. Installation de Composer.
+
+### 9. Création de la structure primaire du projet :
 
 - Les dossiers : `public`, `src`, `config`
 - Les fichiers : `public/index.php`, `config/database.php`, `.env`.
 
-### 7. Création de la BD TP_DWWM_EcoRide à MySQL via phpMyAdmin.
+### 10. Création de la base de données DB_EcoRide à MySQL via phpMyAdmin.
 
-### 8. Création de la table "users" dans la base de données TP_DWWM_EcoRide.
+### 11. Création de la table "utilisateur" dans la base de données DB_EcoRide.
 
-### 9. Démarrage du premier script PHP " Bienvenue dans EcoRide ! " :
+### 12. Démarrage du premier script PHP " Bienvenue dans EcoRide ! " :
 
 - Ajout du code avec " Bienvenue dans EcoRide! " dans public/index.php via VS Code ;
 - Lancement du serveur localhost:8080 ;
 - Vérification de la page http://localhost:8080 dans le navigateur.
 
-### 10. Routage
+### 13. Routage initiale
 
 Le fichier `public/index.php` gère le routage des pages du site :
 
@@ -56,6 +63,34 @@ if (array_key_exists($request, $routes)) {
 - **/config** : Dossier destiné à stocker les fichiers de configuration. Par exemple, le fichier `database.php` contient les paramètres de connexion à la base de données.
 
 - **.env** : Ce fichier contient des variables d'environnement confidentielles, telles que les paramètres de connexion à la base de données, les clés API et d'autres données sensibles qui ne doivent pas être ajoutées au système de contrôle de version.
+
+## Justification des choix techniques
+
+### Environnement de développement
+- **VS Code + Copilot** : Choisi pour sa légèreté, ses nombreuses extensions et l'aide à la programmation via Copilot
+
+### Stack technique
+- **PHP 8.4.2** : Dernière version stable offrant les fonctionnalités modernes de PHP comme les types, les attributs et les améliorations de performance
+- **MySQL 9.1.0** : Choisi pour :
+  - Sa fiabilité et ses performances pour les données relationnelles
+  - Sa compatibilité avec PHP via PDO
+  - Sa facilité d'administration avec phpMyAdmin
+
+- **MongoDB v8.0.4** : Sélectionné pour :
+  - Sa flexibilité pour stocker des données non structurées
+  - Ses performances pour les opérations de lecture
+  - Son utilisation complémentaire avec MySQL
+
+### Structure du projet
+- Architecture MVC choisie pour :
+  - Séparation claire des responsabilités
+  - Facilité de maintenance
+  - Evolutivité du code
+
+### Sécurité
+- Utilisation de fichier `.env` pour protéger les données sensibles
+- Configuration de PDO pour les requêtes préparées
+- Séparation des fichiers publics dans le dossier `/public`
 
 ## Ajout du Header 
 
