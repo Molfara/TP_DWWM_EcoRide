@@ -1,3 +1,7 @@
+<?php
+// public/header.php
+session_start();
+?>
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -19,7 +23,16 @@
         <ul>
             <li><a href="/">Accueil</a></li>
             <li><a href="/covoiturage">Covoiturage</a></li>
-            <li><a href="/connection">Connection</a></li>
+
+
+<li class="dropdown">
+    <a href="#">Connexion</a>
+    <ul class="dropdown-menu">
+        <li><a href="/connexion">Se connecter</a></li>
+        <li><a href="/inscription">Créer un compte</a></li>
+    </ul>
+</li>
+
             <li><a href="/contact">Contact</a></li>
         </ul>
     </nav>
