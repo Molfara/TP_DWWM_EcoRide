@@ -1,0 +1,7 @@
+2025-02-14 15:08:54 - Début du script
+2025-02-14 15:23:27 - Début du script
+Erreur PDO : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'role' in 'field list'
+2025-02-14 15:24:30 - Début du script
+Erreur PDO : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'role' in 'field list'
+2025-02-14 15:25:56 - Début du script
+Erreur PDO : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'role' in 'field list'
