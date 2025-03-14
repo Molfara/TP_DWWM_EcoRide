@@ -29,7 +29,7 @@ nav ul li {
 }
 
 /* Style des liens du menu */
-nav ul li a {
+nav ul li a, nav ul li .dropdown-trigger {
     text-decoration: none; /* Suppression du soulignement */
     color: #333; /* Couleur du texte */
     font-weight: bold; /* Texte en gras */
@@ -178,4 +178,264 @@ button[type="submit"]:hover {
 /* Styles supplémentaires pour les espaces réservés */
 ::placeholder {
     color: #999;
+}
+
+/* Styles pour la page de sélection de rôle */
+.role-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Style pour le titre de la page de rôle */
+.role-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Style pour la question de choix de rôle */
+.role-question {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+/* Style pour le conteneur des boutons de rôle */
+.role-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Style général des boutons de rôle */
+.role-button {
+    width: 100%;
+    max-width: 200px;
+    padding: 12px;
+    background-color: #0099FF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* Style au survol des boutons de rôle */
+.role-button:hover {
+    background-color: #007ACC;
+}
+
+
+/* Style spécifique pour la section hero de l'espace passager */
+.passenger-hero {
+    background-image: url('/images/BackgroundImage2.png');
+    height: 110px;
+    display: flex; /* Ajout de flexbox pour aligner les éléments */
+    align-items: center; /* Centrage vertical */
+}
+
+/* Conteneur pour le contenu dans la section hero */
+.passenger-content {
+    width: 100%;
+    display: flex; /* Utilisation de flexbox pour le contenu */
+    justify-content: space-between; /* Distribution des éléments: un à gauche, l'autre à droite */
+    align-items: center; /* Centrage vertical */
+    padding: 0 10%; /* Espacement à gauche et à droite */
+}
+
+/* Style pour le titre (sans marge pour ne pas perturber l'alignement) */
+.passenger-content h1 {
+    margin: 0;
+}
+
+/* Style pour le bouton blanc */
+.btn-white {
+    background-color: white;
+    color: #333; /* Couleur du texte */
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    margin: 0; /* Suppression de la marge supérieure précédente */
+}
+
+
+.btn-white:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles pour les boutons d'action principaux */
+.main-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.btn-large {
+    padding: 15px 30px;
+    font-size: 1.1em;
+}
+
+
+
+/* Style général du footer */
+footer {
+    display: flex; /* Affichage en ligne avec flexbox */
+    justify-content: space-between; /* Espacement entre les liens et la marque */
+    align-items: center; /* Alignement vertical des éléments */
+    padding: 10px 20px; /* Espacement interne */
+    background: #fff; /* Fond blanc */
+    border-top: 2px solid #ddd; /* Bordure grise en haut du footer */
+    margin-top: 30px; /* Espacement avec le contenu au-dessus */
+}
+
+/* Style pour les liens à gauche */
+.footer-links {
+    display: flex; /* Affichage en ligne des éléments */
+    gap: 20px; /* Espacement entre les liens */
+    padding: 0; /* Suppression du padding */
+    margin: 0; /* Suppression des marges */
+}
+
+/* Style des liens dans le footer */
+.footer-links a {
+    text-decoration: none; /* Suppression du soulignement */
+    color: #333; /* Couleur du texte */
+    font-weight: bold; /* Texte en gras */
+    transition: color 0.3s; /* Effet de transition sur la couleur */
+}
+
+/* Changement de couleur au survol des liens */
+.footer-links a:hover {
+    color: #007bff; /* Bleu lors du survol */
+}
+
+/* Style pour la section marque à droite */
+.footer-brand {
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Organisation en colonne */
+    align-items: flex-end; /* Alignement à droite */
+}
+
+/* Style pour la ligne avec emblème et nom */
+.footer-emblem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Style de l'emblème */
+.footer-emblem img {
+    height: 40px; /* Hauteur de l'emblème */
+    width: auto;
+}
+
+/* Style du nom du service */
+.footer-name {
+    color: #333;
+    font-weight: bold;
+}
+
+
+/* Style pour le titre principal de la page */
+.page-title {
+    text-align: center;
+    margin: 30px 0;
+    color: #4A4A4A; /* Gris foncé pour le titre principal */
+    font-size: 1.8em;
+}   
+
+/* Conteneur principal pour les actions */
+.action-container {
+    display: flex;
+    justify-content: center;
+    gap: 60px; /* Espace entre les deux blocs */
+    margin: 30px auto;
+    max-width: 1200px;
+}
+
+/* Style des blocs d'action */
+.action-block {
+    width: 35%; /* Plus étroit que la moitié (environ 1,7 fois plus étroit que 60%) */
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+     
+/* Titre des actions centré */
+.action-title {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #4A4A4A; /* Gris foncé pour les sous-titres */
+    font-weight: 600; /* Un peu plus léger que bold */
+}
+
+/* Texte justifié */
+.action-text {
+    text-align: justify;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    color: #6C7A89; /* Gris plus clair pour le texte */
+}   
+
+
+/* Style pour les icônes */
+.action-icon {
+    text-align: left; /* Changé de 'center' à 'left' */
+    margin-bottom: 15px;
+    display: flex; /* Utilisation de flexbox */
+    justify-content: flex-start; /* Alignement à gauche */
+}
+
+.action-icon img {
+    width: 40px;
+    height: 40px;
+}
+
+/* Style responsif pour les petits écrans */
+@media (max-width: 768px) {
+    .action-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .action-block {
+        width: 90%;
+    }
+}
+    
+/* Style général des boutons de rôle - Inchangé */
+.role-button {
+    display: block;
+    width: 100%;   
+    max-width: 200px;
+    padding: 12px;
+    background-color: #0099FF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    margin: 0 auto;
+}
+ 
+/* Style au survol des boutons de rôle - Inchangé */
+.role-button:hover {
+    background-color: #007ACC;
 }

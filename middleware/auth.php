@@ -1,3 +1,4 @@
+<?php
 // middleware/auth.php
 function checkAuth() {
     if (!isset($_SESSION['user_id'])) {
@@ -12,3 +13,4 @@ function checkAdmin() {
         exit();
     }
 }
+?>

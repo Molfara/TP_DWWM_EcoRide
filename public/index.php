@@ -13,29 +13,27 @@ $routes = [
    'covoiturage' => 'pages/covoiturage.php',
    'contact' => 'pages/contact.php',
    'se-connecter' => [
-       'GET' => 'pages/login.php',
-       'POST' => 'traitement/login.php'
+       'GET' => 'pages/connexion.php',
+       'POST' => 'traitement/connexion.php'
    ],
    'inscription' => [
        'GET' => 'pages/inscription.php',
        'POST' => 'traitement/inscription.php'
    ],
-   
-   // Routes protégées - Espace utilisateur
-   'mon-compte' => [
+
+   'role' => [
+        'GET' => 'pages/role.php',
+        'POST' => 'traitement/role.php'
+    ],
+
+// Ajouter la route pour la déconnexion
+'deconnexion' => 'traitement/deconnexion.php',
+
+   // Route pour espace passager
+   'espace-passager' => [
        'middleware' => 'checkAuth',
-       'handler' => 'pages/mon-compte.php'
+       'handler' => 'pages/espace_passager.php'   
    ],
-   'mes-trajets' => [
-       'middleware' => 'checkAuth',
-       'handler' => 'pages/mes-trajets.php'
-   ],
-   
-   // Routes protégées - Espace administrateur
-   'admin/dashboard' => [
-       'middleware' => 'checkAdmin',
-       'handler' => 'pages/admin/dashboard.php'
-   ]
 ];
 
 // Logique de routage
@@ -43,12 +41,18 @@ if (array_key_exists($request, $routes)) {
    $route = $routes[$request];
    
    // Vérification du middleware si présent
-   if (isset($route['middleware'])) {
-       require_once 'middleware/auth.php';
-       $middleware = $route['middleware'];
-       $middleware();
-       require __DIR__ . '/../' . $route['handler'];
-   }
+if (isset($route['middleware'])) {
+    require_once __DIR__ . '/../middleware/auth.php';
+// Vérifiez le nom du middleware et appelez la fonction correspondante
+    if ($route['middleware'] === 'checkAuth') {
+        checkAuth();
+    } else if ($route['middleware'] === 'checkAdmin') {
+        checkAdmin();
+    }
+    require __DIR__ . '/../' . $route['handler'];
+}
+
+
    // Traitement des routes avec méthodes GET/POST
    else if (is_array($route) && !isset($route['handler'])) {
        require __DIR__ . '/../' . $route[$method];
@@ -62,3 +66,6 @@ if (array_key_exists($request, $routes)) {
    http_response_code(404);
    echo "Page non trouvée.";
 }
+
+// Ajouter le footer à la fin
+require 'footer.php';

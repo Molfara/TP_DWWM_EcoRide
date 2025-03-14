@@ -1,5 +1,4 @@
 <?php
-// public/header.php
 session_start();
 ?>
 
@@ -23,7 +22,7 @@ session_start();
         <ul>
             <li><a href="/">Accueil</a></li>
             <li><a href="/covoiturage">Covoiturage</a></li>
-
+            <li><a href="/contact">Contact</a></li>
 
 <li class="dropdown">
     <a href="#">Connexion</a>
@@ -33,8 +32,6 @@ session_start();
     </ul>
 </li>
 
-            <li><a href="/contact">Contact</a></li>
         </ul>
     </nav>
 </header>
-

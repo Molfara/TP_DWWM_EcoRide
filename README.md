@@ -206,7 +206,69 @@ Pour contribuer au développement de la base de données :
     ```
 
 
+## Formulaire d'inscription
 
+1. Création du formulaire dans `pages/inscription.php` avec champs pour pseudo, email et mot de passe
+2. Implémentation du traitement dans `traitement/inscription.php`
+3. Ajout de la validation des données et hachage du mot de passe
+4. Configuration de l'insertion en base de données avec 20 crédits initiaux
+5. Mise en place de la redirection vers la page de sélection de rôle
 
+## Implémentation de la page de sélection de rôle
 
+La page de sélection de rôle permet aux utilisateurs de choisir s'ils souhaitent utiliser EcoRide en tant que passager ou chauffeur. Cette page apparaît après l'inscription ou la connexion.
 
+### Fichiers créés/modifiés
+* `pages/role.php` - Interface utilisateur
+* `traitement/role.php` - Traitement du choix
+* Ajout des styles dans `public/style.css`
+* Ajout du routage dans `public/index.php`
+
+### Fonctionnement
+L'interface présente un message explicatif et deux boutons de choix. La sélection est enregistrée en base de données et détermine les fonctionnalités accessibles à l'utilisateur.
+
+## Formulaire de connexion
+
+1. Création de l'interface dans `pages/connexion.php` avec champs pour email et mot de passe
+2. Implémentation de la logique d'authentification dans `traitement/connexion.php`
+3. Configuration de la vérification sécurisée des identifiants
+4. Mise en place de la redirection vers la page de sélection de rôle après connexion
+5. Harmonisation du style avec le formulaire d'inscription
+
+## Implémentation du footer
+
+Le footer a été intégré pour fournir des informations légales et maintenir une cohérence visuelle sur toutes les pages de la plateforme.
+
+### Fichiers créés/modifiés
+* `public/footer.php` - Template du footer avec liens et identification de marque
+* Ajout des styles dans `public/style.css` pour harmoniser l'apparence avec le header
+* Modification de `public/index.php` pour inclure automatiquement le footer sur toutes les pages
+
+### Fonctionnalités
+* Affichage des liens vers les informations légales et paramètres de cookies à gauche
+* Présentation de l'emblème et du copyright EcoRide à droite
+* Style cohérent avec le reste de l'interface (bordures, couleurs, espacement)
+* Chargement automatique sur toutes les pages du site via le routeur central
+
+## Espace Passager
+
+L'espace passager représente l'interface principale permettant aux utilisateurs ayant choisi le rôle de passager d'accéder aux fonctionnalités essentielles de covoiturage.
+
+### Fichiers créés/modifiés
+* `pages/espace_passager.php` - Interface utilisateur dédiée aux passagers
+* Enrichissement du `public/style.css` avec les styles spécifiques
+* Ajout d'icônes dans `public/images/icons/` pour l'interface
+
+### Fonctionnalités
+* Authentification avec vérification du rôle "passager"
+* En-tête personnalisé avec image de fond et bouton de changement de rôle
+* Section centrale avec deux fonctionnalités principales :
+  * Recherche de covoiturage (avec icône de recherche)
+  * Consultation des trajets réservés (avec icône d'historique)
+* Mise en page responsive adaptée aux différents formats d'écran
+
+### Aspects techniques
+* Sécurisation de l'accès via middleware d'authentification
+* Récupération des données utilisateur depuis la base de données
+* Design moderne avec une attention particulière aux couleurs et contrastes
+* Organisation optimisée du contenu pour une expérience utilisateur intuitive
