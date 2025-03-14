@@ -56,6 +56,7 @@ if (array_key_exists($request, $routes)) {
 ```
 
 ## Description des dossiers et fichiers :
+
 - **/public** : Ce dossier contient les fichiers accessibles aux utilisateurs via le navigateur. Il comprend le fichier `index.php`, qui est le point d'entrée pour toutes les requêtes HTTP.
 
 - **/src** : Ce dossier contient le code principal de l'application, y compris la logique métier, les modèles, les contrôleurs et d'autres composants.
@@ -64,13 +65,25 @@ if (array_key_exists($request, $routes)) {
 
 - **.env** : Ce fichier contient des variables d'environnement confidentielles, telles que les paramètres de connexion à la base de données, les clés API et d'autres données sensibles qui ne doivent pas être ajoutées au système de contrôle de version.
 
+- **/public** : Ce dossier contient les fichiers accessibles aux utilisateurs via le navigateur. Il comprend le fichier `index.php`, qui es$
+
+- **/src** : Ce dossier contient le code principal de l'application, y compris la logique métier, les modèles, les contrôleurs et d'autres $
+
+- **/config** : Dossier destiné à stocker les fichiers de configuration. Par exemple, le fichier `database.php` contient les paramètres de $
+
+- **.env** : Ce fichier contient des variables d'environnement confidentielles, telles que les paramètres de connexion à la base de données$
+
 ## Justification des choix techniques
 
 ### Environnement de développement
 - **VS Code + Copilot** : Choisi pour sa légèreté, ses nombreuses extensions et l'aide à la programmation via Copilot
 
 ### Stack technique
+
 - **PHP 8.4.2** : Dernière version stable offrant les fonctionnalités modernes de PHP comme les types, les attributs et les améliorations de performance
+
+- **PHP 8.4.2** : Dernière version stable offrant les fonctionnalités modernes de PHP comme les types, les attributs et les améliorations d$
+
 - **MySQL 9.1.0** : Choisi pour :
   - Sa fiabilité et ses performances pour les données relationnelles
   - Sa compatibilité avec PHP via PDO
@@ -101,12 +114,25 @@ if (array_key_exists($request, $routes)) {
 
 ### Intégration  
 Ajout du header dans les pages avec :  
+  
+## Ajout du Header
+
+### Structure
+- `public/header.php` : contient le logo et le menu de navigation
+- `public/images/logo.png` : fichier du logo
+- `public/style.css` : styles du header
+   
+### Intégration
+Ajout du header dans les pages avec :
 ```php
 require __DIR__ . '/../public/header.php';
 ```
 
 ### Styles principaux (public/style.css) 
 Les styles du header sont définis dans `public/style.css` pour assurer une mise en page cohérente et responsive.  
+
+### Styles principaux (public/style.css)
+Les styles du header sont définis dans `public/style.css` pour assurer une mise en page cohérente et responsive.
 
 ```php
 .logo img {
@@ -133,6 +159,10 @@ nav ul {
 1. **Connexion à Heroku**
 
 2. **Ajout du remote Heroku** 
+  
+1. **Connexion à Heroku**
+
+2. **Ajout du remote Heroku**
 
 3. **Ajout et commit des modifications**
 
@@ -146,6 +176,7 @@ nav ul {
 # Structure de la Base de Données EcoRide
 
 ## Description
+
 Ce projet contient la structure de la base de données pour l'application de covoiturage écologique EcoRide. La base de données gère les utilisateurs, les voitures, les trajets et les systèmes de notation.
 
 ## Structure
@@ -208,15 +239,14 @@ Pour contribuer au développement de la base de données :
 
 ## Formulaire d'inscription
 
-1. Création du formulaire dans `pages/inscription.php` avec champs pour pseudo, email et mot de passe
-2. Implémentation du traitement dans `traitement/inscription.php`
+1. Création du formulaire dans `pages/inscription.php` avec champs pour pseudo, email et mot de passe2. Implémentation du traitement dans `traitement/inscription.php`
 3. Ajout de la validation des données et hachage du mot de passe
 4. Configuration de l'insertion en base de données avec 20 crédits initiaux
 5. Mise en place de la redirection vers la page de sélection de rôle
 
 ## Implémentation de la page de sélection de rôle
 
-La page de sélection de rôle permet aux utilisateurs de choisir s'ils souhaitent utiliser EcoRide en tant que passager ou chauffeur. Cette page apparaît après l'inscription ou la connexion.
+La page de sélection de rôle permet aux utilisateurs de choisir s'ils souhaitent utiliser EcoRide en tant que passager ou chauffeur. Cette $
 
 ### Fichiers créés/modifiés
 * `pages/role.php` - Interface utilisateur
