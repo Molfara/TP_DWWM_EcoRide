@@ -1,13 +1,25 @@
 <?php
-// Paramètres de connexion à la base de données
-$host = 'localhost';     // Hôte de la base de données
-$dbname = 'DB_EcoRide';    // Nom de votre base de données
-$username = 'root';     // Nom d'utilisateur de la base de données
-$password = 'Molfarka8';         // Mot de passe de la base de données
-$port = '3306';         // Port par défaut pour MySQL
-
+// Obtention de l'URL de la base de données depuis la variable d'environnement
+$dbUrl = getenv('JAWSDB_URL');
+if ($dbUrl) {
+    // Analyse de l'URL en composants
+    $dbParts = parse_url($dbUrl);
+    
+    $host = $dbParts['host'];
+    $username = $dbParts['user'];
+    $password = $dbParts['pass'];
+    $dbname = ltrim($dbParts['path'], '/');
+    $port = isset($dbParts['port']) ? $dbParts['port'] : 3306;
+} else {
+    // Paramètres locaux pour le développement
+    $host = 'localhost';
+    $dbname = 'DB_EcoRide';
+    $username = 'root';
+    $password = 'Molfarka8';
+    $port = '3306';
+}
 try {
-    // Création de la connexion PDO
+    // Création de la connexion
     $pdo = new PDO(
         "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
         $username,
@@ -19,6 +31,5 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    // En cas d'erreur, afficher le message et arrêter le script
     die("Erreur de connexion à la base de données : " . $e->getMessage());
 }
