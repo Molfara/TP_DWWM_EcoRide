@@ -4,7 +4,6 @@ $dbUrl = getenv('JAWSDB_URL');
 if ($dbUrl) {
     // Analyse de l'URL en composants
     $dbParts = parse_url($dbUrl);
-    
     $host = $dbParts['host'];
     $username = $dbParts['user'];
     $password = $dbParts['pass'];
