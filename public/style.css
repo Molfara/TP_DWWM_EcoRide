@@ -29,7 +29,7 @@ nav ul li {
 }
 
 /* Style des liens du menu */
-nav ul li a, nav ul li .dropdown-trigger {
+nav ul li a, nav ul li .dropdown-toggle {
     text-decoration: none; /* Suppression du soulignement */
     color: #333; /* Couleur du texte */
     font-weight: bold; /* Texte en gras */
@@ -40,7 +40,7 @@ nav ul li a, nav ul li .dropdown-trigger {
 nav ul li a:hover {
     color: #007bff; /* Bleu lors du survol */
 }
-
+    
 /* Style de la section hero avec l'image de fond */
 .hero-background {
     background-image: url('/images/BackgroundImage1.png');
@@ -48,7 +48,7 @@ nav ul li a:hover {
     background-position: center;
     background-repeat: no-repeat;
     height: 400px;
-    width: 100%;
+    width: 100%;   
     display: flex;
     justify-content: center;
     align-items: center;
@@ -73,35 +73,152 @@ nav ul li a:hover {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4); /* Fond semi-transparent noir */
 }
-
+    
 .dropdown {
     position: relative;
 }
 
 .dropdown-menu {
     display: none;
+
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0; /* Alignement à droite au lieu de la gauche */
     background: white;
-    min-width: 150px;
+    min-width: 140px; /* Augmentation de la largeur minimale */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 1000;
+    border-radius: 4px; /* Bords arrondis pour un look plus moderne */
+    padding: 5px 0; /* Ajout d'un peu de marge en haut et en bas */
 }
-
+    
 .dropdown:hover .dropdown-menu {
     display: block;
 }
 
 .dropdown-menu li {
     display: block;
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
 }
-
+    
 .dropdown-menu a {
-    padding: 10px;
+    padding: 10px 15px; /* Augmentation des marges pour une meilleure cliquabilité */
     display: block;
+    width: 100%; /* Occuper toute la largeur du parent */ 
+    box-sizing: border-box; /* Inclure le padding dans la largeur totale */
+    text-align: left; /* Alignement du texte à gauche */
 }
 
+/* Styles pour le burger menu (caché sur desktop) */
+.burger-menu {
+    display: none; /* Caché par défaut sur desktop */
+    flex-direction: column; /* Empilage vertical des barres */
+    justify-content: space-between; /* Espacement égal entre les barres */
+    width: 30px; /* Largeur du burger menu */
+    height: 21px; /* Hauteur du burger menu */
+    cursor: pointer; /* Curseur pointer au survol */
+    z-index: 1001; /* S'assurer qu'il est au-dessus des autres éléments */
+}
+
+/* Style des barres du burger menu */
+.burger-menu span {
+    display: block;
+    height: 3px; /* Épaisseur des barres */
+    width: 100%;
+    background-color: #333; /* Couleur des barres */
+    transition: all 0.3s ease; /* Animation lors du clic */
+}
+
+/* Animation du burger menu en croix lorsqu'il est actif */
+.burger-menu.active span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg); /* Rotation de la première barre */
+}
+
+.burger-menu.active span:nth-child(2) {
+    opacity: 0; /* Masquer la barre du milieu */
+}
+
+.burger-menu.active span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg); /* Rotation de la dernière barre */
+}
+
+/* Media queries pour le responsive */
+@media screen and (max-width: 768px) {
+    /* Afficher le burger menu sur mobile */
+    .burger-menu {
+        display: flex;
+    }
+    
+    /* Masquer le menu de navigation par défaut */
+    nav {
+        position: absolute;
+        top: 120px; /* Positionner sous le header (ajuster selon la hauteur de votre header) */
+        left: 0;
+        width: 100%;
+        background-color: white;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+    
+    nav ul.nav-menu {
+        display: none; /* Masqué par défaut */
+        flex-direction: column; /* Empilage vertical des liens */
+        width: 100%;
+        padding: 20px 0;
+        margin: 0;
+    }
+    
+    /* Afficher le menu quand actif */
+    nav ul.nav-menu.active {
+        display: flex;
+    }
+    
+    /* Ajustement des éléments du menu */
+    nav ul li {
+        display: block;
+        text-align: center;
+        margin: 10px 0;
+    }
+    
+    /* Style du dropdown en version mobile */
+    .dropdown-menu {
+        position: static; /* Position normale dans le flux du document */
+        box-shadow: none;
+        width: 100%;
+        display: none;
+        margin-top: 10px;
+        padding: 0;
+    }
+    
+    /* Afficher le dropdown quand actif */
+    .dropdown.active .dropdown-menu {
+        display: block;
+    }
+    
+    /* Indicateur visuel pour le dropdown */
+    .dropdown-toggle:after {
+        content: "▼"; /* Flèche vers le bas */
+        font-size: 12px;
+        margin-left: 5px;
+    }
+    
+    /* Changer l'indicateur quand le dropdown est ouvert */
+    .dropdown.active .dropdown-toggle:after {
+        content: "▲"; /* Flèche vers le haut */
+    }
+}
+
+/* Ajustements supplémentaires pour les très petits écrans */
+@media screen and (max-width: 480px) {
+    header {
+        padding: 10px; /* Réduire le padding */
+    }
+    
+    .logo img {
+        height: 70px; /* Réduire la taille du logo */
+    }
+}
+    
 /* Styles pour le formulaire */
 form {
     max-width: 500px;  /* Largeur maximale */
