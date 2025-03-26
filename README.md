@@ -302,3 +302,105 @@ L'espace passager représente l'interface principale permettant aux utilisateurs
 * Récupération des données utilisateur depuis la base de données
 * Design moderne avec une attention particulière aux couleurs et contrastes
 * Organisation optimisée du contenu pour une expérience utilisateur intuitive
+
+## Configuration de la base de données DB_EcoRide sur Heroku
+
+### Problème
+Heroku ne prend pas en charge MySQL par défaut, il a donc été nécessaire d'utiliser l'addon JawsDB.
+
+### Installation de JawsDB MySQL
+Ajout de la base de données via la ligne de commande :
+```sh
+heroku addons:create jawsdb:kitefin
+```
+Vérification du statut de la base de données :
+```sh
+heroku addons:info jawsdb-spherical-15054
+```
+Obtention de la chaîne de connexion :
+```sh
+heroku config | grep JAWSDB_URL
+```
+
+### Configuration de la connexion en PHP
+Le fichier `config/database.php` a été mis à jour pour prendre en charge la variable d'environnement `JAWSDB_URL` :
+```php
+<?php
+$dbUrl = getenv('JAWSDB_URL');
+if ($dbUrl) {
+    $dbParts = parse_url($dbUrl);
+    $host = $dbParts['host'];
+    $username = $dbParts['user'];
+    $password = $dbParts['pass'];
+    $dbname = ltrim($dbParts['path'], '/');
+    $port = isset($dbParts['port']) ? $dbParts['port'] : 3306;
+} else {
+    $host = 'localhost';
+    $dbname = 'DB_EcoRide';
+    $username = 'root';
+    $password = 'Molfarka8';
+    $port = '3306';
+}
+try {
+    $pdo = new PDO(
+        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+        $username,
+        $password,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false
+        ]
+    );
+} catch (PDOException $e) {
+    die("Erreur de connexion à la base de données : " . $e->getMessage());
+}
+```
+
+### Transfert des données vers JawsDB
+Comme Heroku limite les privilèges des utilisateurs de la base de données, seules la structure et les données sans `DEFINER` et `GTID` ont été exportées :
+```sh
+mysqldump -u root -pMolfarka8 --no-data --skip-triggers DB_EcoRide > ecoride_structure.sql
+mysqldump -u root -pMolfarka8 --no-create-info --skip-triggers --complete-insert DB_EcoRide > ecoride_data.sql
+```
+Modification du fichier `ecoride_structure.sql` pour supprimer les lignes `DEFINER` et `GTID`, puis importation dans JawsDB :
+```sh
+mysql -h <hostname> -u <username> -p<password> <database_name> < ecoride_structure.sql
+mysql -h <hostname> -u <username> -p<password> <database_name> < ecoride_data.sql
+```
+Vérification de la présence des tables et des données :
+```sh
+mysql -h <hostname> -u <username> -p<password> <database_name> -e "SHOW TABLES;"
+```
+
+### Déploiement sur Heroku
+```sh
+git add config/database.php
+git commit -m "Configuration DB pour Heroku"
+git push heroku main
+```
+
+### Remarque importante
+Les bases de données phpMySQL (locale) et JawsDB (Heroku) **ne sont pas synchronisées automatiquement**. La base de données locale contient des données de test, tandis que JawsDB contient les données de la version en production. Il est important de prendre cela en compte lors des tests et du déploiement des modifications.
+
+
+## Implémentation du Menu Responsive
+
+### Modification du Header
+- Ajout d'un bouton "burger menu" (trois barres horizontales)
+- Ajout de la classe `nav-menu` au menu de navigation existant
+- Remplacement de `<a href="#">Connexion</a>` par `<span class="dropdown-toggle">Connexion</span>`
+
+### Ajout de CSS Responsive
+- Création des styles pour l'icône burger (3 spans avec transitions)
+- Ajout de media queries pour les écrans <= 768px:
+  - Affichage du burger menu
+  - Transformation du menu horizontal en menu vertical
+  - Adaptation des dropdowns pour le mobile
+
+### Ajout de JavaScript
+- Toggle des classes `.active` lors du clic sur le burger
+- Gestion spécifique des dropdowns en version mobile
+- Fermeture automatique du menu lors du clic sur un lien
+
+Le résultat final permet une navigation fluide sur tous les appareils : menu horizontal sur desktop, menu burger sur mobile.
