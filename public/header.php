@@ -18,20 +18,99 @@ session_start();
             <img src="images/logo.png" alt="EcoRide Logo">
         </a>
     </div>
+
+<!-- Bouton du menu burger (visible uniquement sur mobile) -->
+    <div class="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
     <nav>
-        <ul>
+        <ul class="nav-menu">
             <li><a href="/">Accueil</a></li>
             <li><a href="/covoiturage">Covoiturage</a></li>
             <li><a href="/contact">Contact</a></li>
 
-<li class="dropdown">
-    <a href="#">Connexion</a>
-    <ul class="dropdown-menu">
-        <li><a href="/connexion">Se connecter</a></li>
-        <li><a href="/inscription">Créer un compte</a></li>
-    </ul>
-</li>
-
+            <li class="dropdown">
+                <span class="dropdown-toggle">Connexion</span>
+                <ul class="dropdown-menu">
+                    <li><a href="/connexion">Se connecter</a></li>
+                    <li><a href="/inscription">Créer un compte</a></li>
+                </ul>
+            </li>
         </ul>
+
     </nav>
 </header>
+
+<!-- JavaScript pour le menu burger et les dropdowns mobiles -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fonctionnalité du menu burger
+    const burgerMenu = document.querySelector('.burger-menu');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    burgerMenu.addEventListener('click', function() {
+        this.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    }); 
+    
+    // Fonctionnalité pour les dropdowns en version mobile
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            // Vérifier si on est en version mobile
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                // Trouver le parent dropdown
+                const parentDropdown = this.closest('.dropdown');
+                parentDropdown.classList.toggle('active');
+            }
+        });
+    });
+    
+    // Fermeture du menu lors d'un clic sur un lien
+    const navLinks = document.querySelectorAll('.nav-menu a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            burgerMenu.classList.remove('active');
+            navMenu.classList.remove('active');
+            
+            // Réinitialiser tous les dropdowns
+            const allDropdowns = document.querySelectorAll('.dropdown');
+            allDropdowns.forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+        });
+    });
+    
+    // Fermer le menu lors d'un clic à l'extérieur
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            const isClickInsideNav = e.target.closest('nav');
+            const isClickOnBurger = e.target.closest('.burger-menu');
+            const isClickOnDropdownToggle = e.target.closest('.dropdown-toggle');
+            
+            if (!isClickInsideNav && !isClickOnBurger && navMenu.classList.contains('active') && !isClickOnDropdownToggle) {
+                navMenu.classList.remove('active');
+                burgerMenu.classList.remove('active');
+            }
+        }
+    });
+    
+    // Réinitialiser lors du redimensionnement de la fenêtre
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navMenu.classList.remove('active');
+            burgerMenu.classList.remove('active');
+            
+            const allDropdowns = document.querySelectorAll('.dropdown');
+            allDropdowns.forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+        }
+    });
+});
+</script>
