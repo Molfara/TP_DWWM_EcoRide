@@ -22,7 +22,7 @@ if (!isset($_SESSION['user_id'])) {
         <p class="role-question">Comment souhaitez-vous utiliser la plateforme ? Vous pourrez toujours modifier ce choix plus tard.</p>
 
         <div class="role-buttons">
-            <form action="/role" method="post">
+            <form action="/traitement/process-role.php" method="post">
                 <input type="hidden" name="role" value="2"> <!-- Pour passager/utilisateur -->
                 <button type="submit" class="role-button passager-button">Je suis passager</button>
             </form>
