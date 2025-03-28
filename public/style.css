@@ -106,7 +106,46 @@ nav ul li a:hover {
     display: block;
     width: 100%; /* Occuper toute la largeur du parent */ 
     box-sizing: border-box; /* Inclure le padding dans la largeur totale */
-    text-align: left; /* Alignement du texte à gauche */
+    text-align: center; /* Alignement du texte au center */
+}
+
+/* Styles pour l'avatar utilisateur */
+.user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.user-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.user-menu {
+    min-width: 180px;
+}
+
+/* Pour s'assurer que le menu déroulant fonctionne correctement en version desktop */
+@media screen and (min-width: 769px) {
+    .user-profile:hover .dropdown-menu {
+        display: block;
+    }
 }
 
 /* Styles pour le burger menu (caché sur desktop) */

@@ -1,56 +1,60 @@
 <?php
-// Activation des rapports d'erreurs pour le développement
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// Activer la mise en tampon de sortie au début du fichier
+ob_start();
 
-// Démarrer la session
-session_start();
+// Vérification de la session
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Journalisation pour le débogage
+file_put_contents('debug_log.txt', date('Y-m-d H:i:s') . " Début du traitement de la connexion\n", FILE_APPEND);
+file_put_contents('debug_log.txt', date('Y-m-d H:i:s') . " État de la session : " . session_status() . "\n", FILE_APPEND);
 
 // Inclusion du fichier de configuration de la base de données
 require_once __DIR__ . '/../config/database.php';
 
-// Journalisation des données pour le débogage
-file_put_contents('../public/debug_connexion.log', date('Y-m-d H:i:s') . " - Début du script connexion\n", FILE_APPEND);
-
+// Vérification si la requête est de type POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $password = $_POST['password'];
+    // Récupération des données du formulaire
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
     
-    // Journalisation pour débogage
-    file_put_contents('../public/debug_connexion.log', "Email: $email\n", FILE_APPEND);
+    // Vérification des champs obligatoires
+    if (empty($email) || empty($password)) {
+        $_SESSION['error'] = "Tous les champs sont obligatoires";
+        header('Location: /connexion');
+        exit();
+    }
     
     try {
-        // Préparation de la requête
-        $query = "SELECT utilisateur_id, pseudo, email, password, role_id FROM utilisateur WHERE email = :email";
-        $stmt = $pdo->prepare($query);
+        // Préparation de la requête pour chercher l'utilisateur par email
+        $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE email = :email");
         $stmt->execute(['email' => $email]);
-        $user = $stmt->fetch();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
+        // Vérification de l'existence de l'utilisateur et de la validité du mot de passe
         if ($user && password_verify($password, $user['password'])) {
-            // Connexion réussie
+            // Configuration des données de session
             $_SESSION['user_id'] = $user['utilisateur_id'];
-            $_SESSION['pseudo'] = $user['pseudo'];
+            $_SESSION['user_pseudo'] = $user['pseudo'];
+            $_SESSION['role'] = 'utilisateur'; // ou une autre valeur de la base de données
             
-            // Journalisation du succès
-            file_put_contents('../public/debug_connexion.log', "Connexion réussie pour utilisateur: {$user['utilisateur_id']}\n", FILE_APPEND);
-            
-            // Redirection simple vers la page de rôle
-            file_put_contents('../public/debug_connexion.log', "Redirection vers /role\n", FILE_APPEND);
+            // Redirection vers la page de choix de rôle
             header('Location: /role');
             exit();
         } else {
-            // Échec de la connexion
-            file_put_contents('../public/debug_connexion.log', "Échec de connexion - Identifiants incorrects\n", FILE_APPEND);
+            // Erreur d'authentification
             $_SESSION['error'] = "Email ou mot de passe incorrect";
-            header('Location: /se-connecter');
+            header('Location: /connexion');
             exit();
         }
     } catch (PDOException $e) {
         // Journalisation de l'erreur
-        file_put_contents('../public/debug_connexion.log', "Erreur PDO: " . $e->getMessage() . "\n", FILE_APPEND);
-        
-        $_SESSION['error'] = "Erreur de connexion à la base de données";
-        header('Location: /se-connecter');
+        error_log("Erreur de connexion : " . $e->getMessage());
+        $_SESSION['error'] = "Une erreur est survenue lors de la connexion";
+        header('Location: /connexion');
         exit();
     }
 }
+?>

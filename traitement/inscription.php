@@ -1,4 +1,5 @@
 <?php
+ob_start();
 // Activation des rapports d'erreurs pour le développement
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -18,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    }
 
    // Nettoyage et validation des données
-   $pseudo = filter_input(INPUT_POST, 'pseudo', FILTER_SANITIZE_STRING);
-   $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+   $pseudo = htmlspecialchars($_POST['pseudo'], ENT_QUOTES, 'UTF-8');
+   $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
    $credits = 20; // Crédits initiaux
    
