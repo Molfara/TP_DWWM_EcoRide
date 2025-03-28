@@ -404,3 +404,47 @@ Les bases de données phpMySQL (locale) et JawsDB (Heroku) **ne sont pas synchro
 - Fermeture automatique du menu lors du clic sur un lien
 
 Le résultat final permet une navigation fluide sur tous les appareils : menu horizontal sur desktop, menu burger sur mobile.
+
+# Développement du Header Dynamique
+
+## Fonctionnalités implémentées
+
+### 1. Header adaptatif selon le statut de connexion
+- **Utilisateur non connecté**: Affiche les options "Accueil", "Covoiturage", "Contact" et "Connexion"
+- **Utilisateur connecté**: Remplace "Connexion" par un avatar utilisateur avec un menu déroulant
+
+### 2. Menu déroulant personnalisé
+- **Après l'authentification**: Menu pour choisir un rôle (passager ou chauffeur)
+- **Rôle Passager**: Menu adapté avec "Mon profil", "Covoiturage", "Mes trajets" et "Déconnecter"
+- **Rôle Chauffeur**: Menu adapté avec options spécifiques aux chauffeurs
+
+### 3. Affichage de l'avatar utilisateur
+- Affichage d'une image si l'utilisateur a téléchargé un avatar
+- Affichage d'un placeholder avec la première lettre du pseudo si aucun avatar n'est disponible
+
+## Architecture technique
+
+### Structure des fichiers
+/public/
+├── header.php       # Template du header avec logique conditionnelle
+├── index.php        # Routeur principal avec traitement des requêtes
+└── style.css        # Styles pour le header et les menus déroulants
+/traitement/
+└── process-role.php # Traitement du choix de rôle utilisateur
+/pages/
+└── role.php         # Page de sélection du rôle
+
+### Amélioration du routeur
+- Séparation de la logique de traitement et d'affichage
+- Traitement des redirections avant l'inclusion du header
+- Gestion des routes API qui ne nécessitent pas header/footer
+
+### Gestion des sessions
+- Stockage du rôle utilisateur dans la variable de session `$_SESSION['role']`
+- Vérification du rôle pour afficher le menu approprié
+- Mise à jour de la base de données lors du changement de rôle
+
+## Défis techniques surmontés
+- Résolution du problème "headers already sent" en réorganisant l'ordre d'exécution des scripts
+- Implémentation de la navigation responsive pour les appareils mobiles
+- Personnalisation du menu déroulant selon le contexte utilisateur
