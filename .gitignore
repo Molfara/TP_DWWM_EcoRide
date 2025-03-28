@@ -23,3 +23,7 @@
 /app/Config/core.php
 /app/Config/database.php
 /vendors/*
+public/debug_*.log
+public/debug_log.txt
+public/debug_*.log
+public/debug_log.txt
