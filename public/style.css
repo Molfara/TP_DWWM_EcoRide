@@ -388,6 +388,20 @@ button[type="submit"]:hover {
     background-color: #007ACC;
 }
 
+/* Style pour le titre du formulaire d'ajout de voiture (similaire à .role-container h1) */
+.car-form-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Style pour la description du formulaire d'ajout de voiture (similaire à .role-question) */
+.car-form-description {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #555;
+    text-align: center;
+}
 
 /* Style spécifique pour la section hero de l'espace passager */
 .passenger-hero {

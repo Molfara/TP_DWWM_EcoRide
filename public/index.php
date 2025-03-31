@@ -1,4 +1,9 @@
 <?php
+
+// Début de la mise en tampon de sortie
+ob_start();
+
+
 // Récupérer l'URI de la requête et supprimer les slashes
 $request = trim($_SERVER['REQUEST_URI'], '/');
 
@@ -23,9 +28,15 @@ if ($request === 'traitement/process-role.php' && $method === 'POST') {
     exit; // Très important - arrête l'exécution ici
 }
 
+// Vérification pour process-car.php
+if ($request === 'traitement/process-car.php' && $method === 'POST') {
+    require __DIR__ . '/../traitement/process-car.php';
+    exit; // Très important - arrête l'exécution ici
+}
+
 // Routes API ou de traitement qui ne nécessitent pas header/footer
 $api_routes = [
-    'traitement/process-role.php' => 'traitement/process-role.php',
+    'traitement/role.php' => 'traitement/role.php',
     // Ajouter d'autres routes de traitement ici si nécessaire
 ];
 
@@ -59,6 +70,25 @@ $routes = [
        'middleware' => 'checkAuth',
        'handler' => 'pages/espace_passager.php'
    ],
+  // Route pour espace chauffeur
+   'espace-chauffeur' => [
+       'middleware' => 'checkAuth',
+       'handler' => 'pages/espace_chauffeur.php'
+ ],
+
+ // Route pour espace chauffeur alternative
+'espace_chauffeur' => [
+   'middleware' => 'checkAuth',
+   'handler' => 'pages/espace_chauffeur.php'
+],
+
+
+ // Route pour ajouter la première voiture
+'ajouter-voiture' => [
+    'middleware' => 'checkAuth',  // Vérification de l'authentification
+    'handler' => 'pages/ajouter-voiture.php'
+],
+
 ];
      
 // Logique de routage 
@@ -92,3 +122,7 @@ if (array_key_exists($request, $routes)) {
         
 // Ajouter le footer à la fin
 require 'footer.php';
+
+// Fin de la mise en tampon de sortie
+ob_end_flush();
+
