@@ -448,3 +448,48 @@ Le résultat final permet une navigation fluide sur tous les appareils : menu ho
 - Résolution du problème "headers already sent" en réorganisant l'ordre d'exécution des scripts
 - Implémentation de la navigation responsive pour les appareils mobiles
 - Personnalisation du menu déroulant selon le contexte utilisateur
+
+# Gestion des véhicules et espace chauffeur
+
+## Fonctionnalités ajoutées
+
+Cette partie du projet implémente la gestion des véhicules pour les utilisateurs qui choisissent le rôle de chauffeur. Voici les principales fonctionnalités :
+
+### Flux d'inscription des chauffeurs
+
+Lorsqu'un utilisateur s'inscrit ou se connecte et choisit le rôle de chauffeur :
+- Le système vérifie si l'utilisateur possède déjà un véhicule enregistré
+- S'il ne possède pas de véhicule, il est redirigé vers la page d'ajout de véhicule
+- Une fois le véhicule ajouté, il accède à son espace chauffeur
+
+### Ajout de véhicule
+
+La page d'ajout de véhicule (`ajouter-voiture.php`) permet à l'utilisateur de :
+- Sélectionner la marque du véhicule depuis une liste déroulante
+- Saisir les informations essentielles (modèle, immatriculation, type d'énergie)
+- Ajouter des informations complémentaires (couleur, date de première immatriculation)
+- Spécifier le nombre de places disponibles
+
+### Espace chauffeur
+
+L'espace chauffeur (`espace_chauffeur.php`) offre une interface dédiée où l'utilisateur peut :
+- Visualiser ses véhicules enregistrés
+- Ajouter d'autres véhicules si nécessaire
+- Consulter ses trajets (fonctionnalité à développer)
+- Proposer de nouveaux trajets (fonctionnalité à développer)
+
+## Architecture technique
+
+L'implémentation repose sur :
+- Une séparation claire entre l'affichage (`pages/`) et le traitement (`traitement/`)
+- Une vérification du rôle utilisateur pour chaque accès à l'espace chauffeur
+- Un système de routage configuré dans `public/index.php` 
+- Un traitement sécurisé des formulaires avec validation côté serveur
+- Une gestion de session pour maintenir l'état de connexion et le rôle de l'utilisateur
+
+## Fichiers créés ou modifiés
+
+- `pages/ajouter-voiture.php` : Interface d'ajout de véhicule
+- `pages/espace_chauffeur.php` : Tableau de bord du chauffeur
+- `traitement/process-car.php` : Traitement du formulaire d'ajout de véhicule
+- `public/index.php` : Ajout des routes pour les nouvelles pages
