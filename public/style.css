@@ -609,3 +609,107 @@ footer {
 .role-button:hover {
     background-color: #007ACC;
 }
+
+
+/* Style spécifique pour la section hero de l'espace chauffeur */
+.driver-hero {
+    background-image: url('/images/BackgroundImage3.png');
+    background-size: cover;
+    background-position: center;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Overlay semi-transparent pour améliorer la lisibilité */
+.driver-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+    
+/* Conteneur pour le contenu dans la section hero */
+.chauffeur-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10%;
+    position: relative;
+    z-index: 1;
+}
+
+/* Style pour le titre */
+.chauffeur-content h1 {
+    margin: 0;
+    color: white;
+    font-weight: bold;
+}
+
+/* Conteneur principal pour les actions */
+.action-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 40px auto;
+    max-width: 900px;
+}
+
+/* Ligne d'actions */
+.action-row {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+}
+
+/* Style des blocs d'action */
+.action-block {
+    flex: 0 1 400px;
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Texte d'action */
+.action-text {
+    flex-grow: 1;
+    text-align: justify;
+    margin-bottom: 25px;
+    line-height: 1.5;
+    color: #6C7A89;
+    font-size: 16px;
+}
+
+/* Conteneur pour centrer le bouton */
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+/* Style pour le titre principal de la page */
+.page-title {
+    text-align: center;
+    margin: 30px 0;
+    color: #4A4A4A;
+    font-size: 1.8em;
+}
+
+/* Media query pour les écrans plus petits */
+@media (max-width: 900px) {
+    .action-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-block {
+        max-width: 500px;
+        width: 100%;
+    }
+}
