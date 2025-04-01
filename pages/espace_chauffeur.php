@@ -60,7 +60,7 @@ try {
     <h2 class="page-title">Optimisez vos déplacements, réduisez les émissions de CO₂</h2>
 
 <!-- Actions principales disponibles pour le chauffeur -->
-    <div class="action-container">
+    <div class=".driver-action-container">
         <div class="action-row">
             <div class="action-block">
                 <p class="action-text">Publiez facilement votre trajet et trouvez des passagers en quelques clics. Optimisez vos déplacements, partagez les frais et contribuez à une mobilité plus durable.</p>

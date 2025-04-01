@@ -528,8 +528,8 @@ footer {
     font-size: 1.8em;
 }   
 
-/* Conteneur principal pour les actions */
-.action-container {
+/* Conteneur principal pour les actions pour la page passager*/
+.passenger-action-container {
     display: flex;
     justify-content: center;
     gap: 60px; /* Espace entre les deux blocs */
@@ -651,8 +651,8 @@ footer {
     font-weight: bold;
 }
 
-/* Conteneur principal pour les actions */
-.action-container {
+/* Conteneur principal pour les actions pour la page chauffeur*/
+.driver-action-container {
     display: flex;
     flex-direction: column;
     gap: 40px;
