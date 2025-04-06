@@ -170,7 +170,7 @@ try {
                     <option value="">Sélectionnez un type d'énergie</option>
                     <option value="essence">Essence</option>
                     <option value="diesel">Diesel</option>
-                    <option value="electrique">Électrique</option>
+                    <option value="électrique">Électrique</option>
                     <option value="hybride">Hybride</option>
                 </select>
             </div>
