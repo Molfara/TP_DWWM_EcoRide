@@ -60,7 +60,7 @@ try {
     <h2 class="page-title">Gérez vos déplacements en toute simplicité</h2>
     
 <!-- Actions principales disponibles pour le passager -->
-<div class="passenger-action-container">
+<div class="passager-action-container">
     <div class="action-block">
         <div class="action-icon">
 
