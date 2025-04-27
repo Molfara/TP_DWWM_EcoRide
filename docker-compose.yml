@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  # Service pour l'application web PHP
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - mysql
+      - mongodb
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+
+  # Service pour la base de données MySQL
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Molfarka8
+      MYSQL_DATABASE: DB_EcoRide
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Molfarka8
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./ecoride_structure.sql:/docker-entrypoint-initdb.d/01-structure.sql
+      - ./ecoride_data.sql:/docker-entrypoint-initdb.d/02-data.sql
+
+  # Service pour la base de données MongoDB (pour les avis)
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: EcoRideReviews
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  # Interface d'administration pour MySQL
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: Molfarka8
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+
+# Définition des volumes persistants
+volumes:
+  mysql_data:
+  mongodb_data:

@@ -1070,3 +1070,163 @@ footer {
     }
 
 }
+
+
+/* Styles pour la page de contact */
+/* Section d'informations de contact */
+.container h2 {
+    color: #333;
+    font-weight: bold;
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+.container p {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.email-contact {
+    text-align: center;
+    margin: 2rem 0;    
+}
+.email-contact a {
+    text-decoration: none;
+    color: #0275d8;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+/* Conteneur de formulaire d'avis - similaire à ajouter-voiture.php */
+.review-form-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 30px;
+    margin: 50px auto;
+    max-width: 800px;
+    box-sizing: border-box;
+}
+.review-form-container h2 {
+    color: #333;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+.review-intro {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;  
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: none; /* Pas de bordure en bas */
+    padding-bottom: 0; /* Pas d'espacement supplémentaire en bas */
+}
+/* Styles pour le formulaire */
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+.form-group label {
+    font-size: 1.1rem; 
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: block;
+    color: #444;   
+}
+.required {
+    color: red;
+    margin-left: 3px;
+}
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem; 
+    margin-top: 5px;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+textarea.form-control {
+    resize: vertical;
+}
+.form-submit {  
+    margin-top: 30px;
+}
+.btn-envoyer {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    background-color: #4195fc;
+    border: none;
+    color: white;
+    border-radius: 5px; 
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+.btn-envoyer:hover {
+    background-color: #3886e8; 
+}
+/* Affichage des avis */
+.review-card {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    height: 100%;  
+    display: flex; 
+    flex-direction: column;
+}
+.review-content {
+    padding: 20px;   
+    flex-grow: 1;
+}
+.review-author {
+    color: #333;  
+    font-weight: bold;
+    font-size: 1.2rem; 
+    margin-bottom: 10px;
+}
+.review-text {
+    color: #666;
+    font-size: 1rem; 
+    line-height: 1.6;
+}
+.review-footer {
+    padding: 10px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    color: #777; 
+    font-size: 0.9rem;
+}
+
+
+/* Styles pour les messages d'alerte */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb; 
+    color: #155724;
+}
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+/* Espacements supplémentaires */
+.mt-5 {
+    margin-top: 50px;
+} 
+.mb-5 {
+    margin-bottom: 50px;
+}
+.mb-4 {
+    margin-bottom: 40px;
+}
