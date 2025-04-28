@@ -1,22 +1,31 @@
-version: '3'
+version: '3.8'
 
 services:
   # Service pour l'application web PHP
   web:
     build: .
+    container_name: ecoride-web
     ports:
       - "8080:80"
     volumes:
       - .:/var/www/html
+      - ./logs/apache:/var/log/apache2
     depends_on:
       - mysql
       - mongodb
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html
+      - JAWSDB_URL=mysql://root:Molfarka8@mysql:3306/DB_EcoRide
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DATABASE=EcoRideReviews
+    restart: unless-stopped
+    networks:
+      - ecoride-network
 
   # Service pour la base de données MySQL
   mysql:
     image: mysql:8.0
+    container_name: ecoride-mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: Molfarka8
@@ -29,10 +38,19 @@ services:
       - mysql_data:/var/lib/mysql
       - ./ecoride_structure.sql:/docker-entrypoint-initdb.d/01-structure.sql
       - ./ecoride_data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ecoride-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Service pour la base de données MongoDB (pour les avis)
   mongodb:
     image: mongo:latest
+    container_name: ecoride-mongodb
     restart: always
     environment:
       MONGO_INITDB_DATABASE: EcoRideReviews
@@ -40,10 +58,19 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+    networks:
+      - ecoride-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Interface d'administration pour MySQL
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: ecoride-phpmyadmin
     environment:
       PMA_HOST: mysql
       PMA_USER: root
@@ -52,8 +79,30 @@ services:
       - "8081:80"
     depends_on:
       - mysql
-
+    networks:
+      - ecoride-network
+      
+  # Interface d'administration pour MongoDB
+  mongo-express:
+    image: mongo-express
+    container_name: ecoride-mongo-express
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+    ports:
+      - "8082:8081"
+    depends_on:
+      - mongodb
+    networks:
+      - ecoride-network
+      
 # Définition des volumes persistants
 volumes:
-  mysql_data:
+  mysql_data:  
   mongodb_data:
+
+# Définition des réseaux
+networks:
+  ecoride-network:
+    driver: bridge
