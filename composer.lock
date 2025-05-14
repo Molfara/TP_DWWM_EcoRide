@@ -8,7 +8,7 @@
     "packages": [
         {
             "name": "mongodb/mongodb",
-            "version": "1.20.0",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mongodb/mongo-php-library.git",
