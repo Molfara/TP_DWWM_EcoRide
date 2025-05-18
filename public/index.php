@@ -34,6 +34,12 @@ if ($request === 'traitement/process-car.php' && $method === 'POST') {
     exit; // Très important - arrête l'exécution ici
 }
 
+// Vérification pour profil-passager.php
+if ($request === 'traitement/profil-passager.php' && $method === 'POST') {
+    require __DIR__ . '/../traitement/profil-passager.php';
+    exit; // Très important - arrête l'exécution ici
+}
+
 // Routes API ou de traitement qui ne nécessitent pas header/footer
 $api_routes = [
     'traitement/role.php' => 'traitement/role.php',
@@ -70,6 +76,14 @@ $routes = [
        'middleware' => 'checkAuth',
        'handler' => 'pages/espace_passager.php'
    ],
+
+   // Route pour profil passager
+   'profil-passager' => [
+       'middleware' => 'checkAuth',
+       'handler' => 'pages/profil-passager.php'
+   ],
+
+
   // Route pour espace chauffeur
    'espace-chauffeur' => [
        'middleware' => 'checkAuth',

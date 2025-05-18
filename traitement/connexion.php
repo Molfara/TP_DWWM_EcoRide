@@ -39,8 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['utilisateur_id'];
             $_SESSION['user_pseudo'] = $user['pseudo'];
             $_SESSION['role'] = 'utilisateur'; // ou une autre valeur de la base de données
-            
-            // Redirection vers la page de choix de rôle
+
+
+    if (!empty($user['photo'])) {
+        $_SESSION['user_avatar'] = '/photo.php?id=' . $user['utilisateur_id'];
+    } else {
+        $_SESSION['user_avatar'] = null;
+    }
+
+// Redirection vers la page de choix de rôle
             header('Location: /role');
             exit();
         } else {

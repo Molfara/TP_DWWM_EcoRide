@@ -2,21 +2,20 @@
 session_start();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoRide</title>
-    <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/style.css?v=<?php echo time(); ?>">
 
 </head>
 <body>
 <header>
     <div class="logo">
         <a href="/">
-            <img src="images/logo.png" alt="EcoRide Logo">
+            <img src="/images/logo.png" alt="EcoRide Logo">
         </a>
     </div>
 
@@ -45,19 +44,20 @@ session_start();
             <?php else: ?>
             <!-- Afficher ceci pour les utilisateurs connectés -->
             <li class="dropdown user-profile">
-                <span class="dropdown-toggle user-avatar">
-                    <?php if (isset($_SESSION['user_avatar']) && $_SESSION['user_avatar']): ?>
-                        <img src="<?php echo htmlspecialchars($_SESSION['user_avatar']); ?>" alt="Profil">
-                    <?php else: ?>
-                        <div class="avatar-placeholder"><?php echo htmlspecialchars(substr($_SESSION['user_pseudo'] ?? 'U', 0, 1)); ?></div>
-                    <?php endif; ?>
-                </span>
 
+<span class="dropdown-toggle user-avatar">
+<?php if (isset($_SESSION['user_avatar']) && $_SESSION['user_avatar']): ?>
+    <img src="<?php echo htmlspecialchars($_SESSION['user_avatar']); ?>" alt="Profil">
+<?php else: ?>
+    <div class="avatar-placeholder"><?php echo htmlspecialchars(substr($_SESSION['user_pseudo'] ?? 'U', 0, 1)); ?></div>
+<?php endif; ?>
+</span>
                 <!-- Menu différent selon le rôle -->
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'passager'): ?>
                 <!-- Menu pour les passagers -->
                 <ul class="dropdown-menu user-menu">
-                    <li><a href="/profil">Mon profil</a></li>
+                    <li><a href="/profil-passager">Mon profil</a></li>
+                    <li><a href="/espace-passager">Mon espace</a></li>
                     <li><a href="/covoiturage">Covoiturage</a></li>
                     <li><a href="/mes-trajets">Mes trajets</a></li>
                     <li><a href="/deconnexion.php">Déconnecter</a></li>
@@ -67,6 +67,7 @@ session_start();
                 <!-- Menu pour les chauffeurs -->
                 <ul class="dropdown-menu user-menu">
                     <li><a href="/profil">Mon profil</a></li>
+                    <li><a href="/espace-chauffeur">Mon espace</a></li>
                     <li><a href="/mes-trajets">Mes trajets</a></li>
                     <li><a href="/proposer-trajet">Proposer un trajet</a></li>
                     <li><a href="/deconnexion.php">Déconnecter</a></li>

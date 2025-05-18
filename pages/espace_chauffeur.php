@@ -43,7 +43,7 @@ try {
     <div class="hero-background driver-hero">
         <div class="chauffeur-content">
             <h1>Espace Chauffeur</h1>
-            <a href="changer_role.php?role=passager" class="btn btn-white">Changer pour passager</a>
+            <a href="role" class="btn btn-white">Changer pour passager</a>
         </div>
     </div>
     
