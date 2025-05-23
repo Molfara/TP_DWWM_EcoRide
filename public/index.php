@@ -35,8 +35,8 @@ if ($request === 'traitement/process-car.php' && $method === 'POST') {
 }
 
 // Vérification pour profil-passager.php
-if ($request === 'traitement/profil-passager.php' && $method === 'POST') {
-    require __DIR__ . '/../traitement/profil-passager.php';
+if ($request === 'traitement/profil-utilisateur.php' && $method === 'POST') {
+    require __DIR__ . '/../traitement/profil-utilisateur.php';
     exit; // Très important - arrête l'exécution ici
 }
 
@@ -82,7 +82,11 @@ $routes = [
        'middleware' => 'checkAuth',
        'handler' => 'pages/profil-passager.php'
    ],
-
+  // Route pour profil chauffeur
+   'profil-chauffeur' => [
+       'middleware' => 'checkAuth',
+       'handler' => 'pages/profil-chauffeur.php'
+   ],
 
   // Route pour espace chauffeur
    'espace-chauffeur' => [

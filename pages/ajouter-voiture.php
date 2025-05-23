@@ -116,11 +116,18 @@ if ($result) {
 // Récupération de la liste des marques pour le menu déroulant
 $marques = [];
 try {
-    $marque_stmt = $pdo->query("SELECT marque_id, libelle FROM marque");
+    // Utilisez GROUP BY pour éliminer les doublons
+    $marque_stmt = $pdo->query("SELECT MIN(marque_id) as marque_id, libelle 
+                               FROM marque 
+                               GROUP BY libelle 
+                               ORDER BY libelle");
     $marques = $marque_stmt->fetchAll();
+    error_log("Nombre de marques uniques récupérées: " . count($marques));
 } catch (PDOException $e) {
     $message = "Erreur lors de la récupération des marques: " . $e->getMessage();
+    error_log($message);
 }
+
 ?>  
             
 

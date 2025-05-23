@@ -5,8 +5,8 @@ session_start();
 // Inclusion du fichier d'authentification pour vérifier les droits d'accès
 require_once __DIR__ . '/../middleware/auth.php';
 
-// Vérification si l'utilisateur est connecté et a le rôle de passager
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'passager') {
+// Vérification si l'utilisateur est connecté (sans vérification de rôle)
+if (!isset($_SESSION['user_id'])) {
     header('Location: /connexion.php');
     exit;
 }
@@ -14,10 +14,14 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 // Récupération des informations de l'utilisateur depuis la base de données
 require_once __DIR__ . '/../config/database.php';
 $userId = $_SESSION['user_id'];
+$userRole = $_SESSION['role'] ?? '';
 
 // Initialisation des variables de messages
 $message = '';
 $error = '';
+
+// Débogage
+error_log("Traitement du profil utilisateur. ID: " . $userId . ", Rôle: " . $userRole);
 
 // TRAITEMENT DE LA MISE À JOUR DES DONNÉES PERSONNELLES
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_personal_data'])) {
@@ -110,20 +114,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_personal_data'
             $_SESSION['pseudo'] = $pseudo;
             
             // Stockage du message dans la session pour affichage après redirection
-            $_SESSION['message'] = $message;
+            $_SESSION['personal_message'] = $message;
             
         } catch (PDOException $e) {
             $error = "Erreur lors de la mise à jour des données: " . $e->getMessage();
             error_log("Erreur SQL: " . $e->getMessage());
-            $_SESSION['error'] = $error;
+            $_SESSION['personal_error'] = $error;
         }
     } else {
         // Stockage des erreurs dans la session pour affichage après redirection
-        $_SESSION['error'] = implode("<br>", $errors);
+        $_SESSION['personal_error'] = implode("<br>", $errors);
     }
     
-    // Redirection vers la page du profil
-    header('Location: /profil-passager');
+    // Redirection vers la page du profil en fonction du rôle
+    if ($userRole === 'chauffeur') {
+        header('Location: /profil-chauffeur');
+    } else {
+        header('Location: /profil-passager');
+    }
     exit;
 }
 
@@ -137,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($action === 'delete' && !empty($field)) {
         // Vérification des champs obligatoires qui ne peuvent pas être supprimés
         if ($field === 'pseudo' || $field === 'email' || $field === 'password') {
-            $_SESSION['error'] = "Les champs obligatoires ne peuvent pas être supprimés.";
+            $_SESSION['personal_error'] = "Les champs obligatoires ne peuvent pas être supprimés.";
         } else {
             // Vérification que le champ existe dans la table (sécurité)
             $allowedFields = ['nom', 'prenom', 'telephone', 'adresse', 'date_naissance'];
@@ -148,25 +156,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute([$userId]);
                     
-                    $_SESSION['message'] = "Le champ a été supprimé avec succès.";
+                    $_SESSION['personal_message'] = "Le champ a été supprimé avec succès.";
                     
                 } catch (PDOException $e) {
-                    $_SESSION['error'] = "Erreur lors de la suppression du champ: " . $e->getMessage();
+                    $_SESSION['personal_error'] = "Erreur lors de la suppression du champ: " . $e->getMessage();
                     error_log("Erreur SQL: " . $e->getMessage());
                 }
             } else {
-                $_SESSION['error'] = "Opération non autorisée sur ce champ.";
+                $_SESSION['personal_error'] = "Opération non autorisée sur ce champ.";
                 error_log("Tentative de suppression d'un champ non autorisé: " . $field);
             }
         }
     }
     
-    // Redirection vers la page du profil
-    header('Location: /profil-passager');
+    // Redirection vers la page du profil en fonction du rôle
+    if ($userRole === 'chauffeur') {
+        header('Location: /profil-chauffeur');
+    } else {
+        header('Location: /profil-passager');
+    }
     exit;
 }
 
 // Si on arrive ici, c'est qu'on n'a pas traité de formulaire, redirection
-header('Location: /profil-passager');
+if ($userRole === 'chauffeur') {
+    header('Location: /profil-chauffeur');
+} else {
+    header('Location: /profil-passager');
+}
 exit;
 ?>

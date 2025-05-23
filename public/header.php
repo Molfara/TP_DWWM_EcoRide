@@ -66,7 +66,7 @@ session_start();
                 <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] == 'chauffeur'): ?>
                 <!-- Menu pour les chauffeurs -->
                 <ul class="dropdown-menu user-menu">
-                    <li><a href="/profil">Mon profil</a></li>
+                    <li><a href="/profil-chauffeur">Mon profil</a></li>
                     <li><a href="/espace-chauffeur">Mon espace</a></li>
                     <li><a href="/mes-trajets">Mes trajets</a></li>
                     <li><a href="/proposer-trajet">Proposer un trajet</a></li>

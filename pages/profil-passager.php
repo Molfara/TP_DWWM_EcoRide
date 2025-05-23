@@ -217,144 +217,218 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_photo'])) {
 </body>
 </html>
 
-
 <!-- Section Mes données personnelles -->
-<div class="personal-data-section">
-<form method="POST" id="personalDataForm" class="personal-data-form" action="/traitement/profil-passager.php">
-    <h2 class="section-title">Mes données personnelles</h2>
-    <p class="section-description">Pour utiliser notre service de covoiturage, veuillez remplir vos informations personnelles.</p>
+<div class="vehicles-section" style="max-width: 600px; margin: 0 auto;">
+    <form method="POST" class="vehicle-form" action="/traitement/profil-utilisateur.php">
+        <h2 class="section-title">Mes données personnelles</h2>
+        <p class="section-description">Pour utiliser notre service de covoiturage, veuillez remplir vos informations personnelles.</p>
             
-    <?php
-    // Affichage des messages de succès ou d'erreur retournés par le traitement
-    if (isset($_SESSION['message'])) {
-        echo '<div class="message success">' . htmlspecialchars($_SESSION['message']) . '</div>';
-        unset($_SESSION['message']);
-    }
-            
-    if (isset($_SESSION['error'])) {
-        echo '<div class="message error">' . htmlspecialchars($_SESSION['error']) . '</div>';
-        unset($_SESSION['error']);
-    }
-    ?>
-            
-    <!-- Formulaire des données personnelles -->
-    <form method="POST" id="personalDataForm" class="personal-data-form" action="/traitement/profil-passager.php">
-        <div class="form-group">
-            <label for="pseudo">Pseudo<sup>*</sup></label>
-            <input type="text" id="pseudo" name="pseudo" value="<?php echo htmlspecialchars($user['pseudo'] ?? ''); ?>" required>
-            <div class="error-message" id="pseudo-error"></div>
-        </div>
-    
-        <div class="form-group">
-            <label for="nom">Nom</label>
-            <input type="text" id="nom" name="nom" value="<?php echo htmlspecialchars($user['nom'] ?? ''); ?>">
-        </div>  
+        <?php
+        // Affichage des messages de succès ou d'erreur pour les données personnelles
+        if (isset($_SESSION['personal_message']) && !empty($_SESSION['personal_message'])) {
+            echo '<div class="message success">' . htmlspecialchars($_SESSION['personal_message']) . '</div>';
+            unset($_SESSION['personal_message']);
+        }
                 
-        <div class="form-group">
-            <label for="prenom">Prénom</label>
-            <input type="text" id="prenom" name="prenom" value="<?php echo htmlspecialchars($user['prenom'] ?? ''); ?>">
-        </div>
-     
-        <div class="form-group">
-            <label for="email">Email<sup>*</sup></label>
-            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
-            <div class="error-message" id="email-error"></div>
-        </div>
+        if (isset($_SESSION['personal_error']) && !empty($_SESSION['personal_error'])) {
+            echo '<div class="message error">' . htmlspecialchars($_SESSION['personal_error']) . '</div>';
+            unset($_SESSION['personal_error']);
+        }
+        ?>
+               
+        <!-- Affichage en lecture seule -->
+        <div id="personalDataDisplay" class="data-display">
+            <div class="data-item">
+                <span class="data-label">Pseudo :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['pseudo'] ?? 'Non renseigné'); ?></span>
+            </div>
             
-        <div class="form-group">
-            <label for="password">Mot de passe<sup>*</sup></label>
-            <input type="password" id="password" name="password" placeholder="Laisser vide pour ne pas modifier">
-            <div class="error-message" id="password-error"></div>
-        </div>
+            <?php if (!empty($user['nom'])): ?>
+            <div class="data-item">
+                <span class="data-label">Nom :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['nom']); ?></span>
+            </div>
+            <?php endif; ?>
             
-        <div class="form-group">
-            <label for="telephone">Téléphone</label>
-            <input type="text" id="telephone" name="telephone" value="<?php echo htmlspecialchars($user['telephone'] ?? ''); ?>">
-        </div>
+            <?php if (!empty($user['prenom'])): ?>
+            <div class="data-item">
+                <span class="data-label">Prénom :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['prenom']); ?></span>
+            </div>
+            <?php endif; ?>
             
-        <div class="form-group">
-            <label for="adresse">Adresse</label>
-            <input type="text" id="adresse" name="adresse" value="<?php echo htmlspecialchars($user['adresse'] ?? ''); ?>">
-        </div>
+            <div class="data-item">
+                <span class="data-label">Email :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['email'] ?? 'Non renseigné'); ?></span>
+            </div>
             
-        <div class="form-group">
-            <label for="date_naissance">Date de naissance</label>
-            <input type="date" id="date_naissance" name="date_naissance" value="<?php echo htmlspecialchars($user['date_naissance'] ?? ''); ?>">
-        </div>
+            <?php if (!empty($user['telephone'])): ?>
+            <div class="data-item">
+                <span class="data-label">Téléphone :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['telephone']); ?></span>
+            </div>
+            <?php endif; ?>
             
-        <div class="form-group">
-            <label for="credits">Crédits</label>
-            <div class="credits-container">
-                <input type="text" id="credits" name="credits" value="<?php echo htmlspecialchars($user['credits'] ?? '0'); ?>" readonly>
+            <?php if (!empty($user['adresse'])): ?>
+            <div class="data-item">
+                <span class="data-label">Adresse :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['adresse']); ?></span>
+            </div>
+            <?php endif; ?>
+            
+            <?php if (!empty($user['date_naissance'])): ?>
+            <div class="data-item">
+                <span class="data-label">Date de naissance :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['date_naissance']); ?></span>
+            </div>
+            <?php endif; ?>
+            
+            <div class="data-item">
+                <span class="data-label">Crédits :</span>
+                <span class="data-value"><?php echo htmlspecialchars($user['credits'] ?? '0'); ?></span>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" id="editPersonalDataBtn" class="btn btn-primary">Modifier</button>
             </div>
         </div>
         
-        <div class="form-note">
-            <p><sup>*</sup> Champs obligatoires</p>
-        </div>
+        <!-- Champs de modification (cachés par défaut) -->
+        <div id="personalDataEditForm" class="data-form" style="display: none;">
+            <div class="form-group">
+                <label for="pseudo">Pseudo<sup>*</sup></label>
+                <input type="text" id="pseudo" name="pseudo" value="<?php echo htmlspecialchars($user['pseudo'] ?? ''); ?>" required>
+                <div class="error-message" id="pseudo-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="nom">Nom</label>
+                <input type="text" id="nom" name="nom" value="<?php echo htmlspecialchars($user['nom'] ?? ''); ?>">
+            </div>
+            
+            <div class="form-group">
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenom" name="prenom" value="<?php echo htmlspecialchars($user['prenom'] ?? ''); ?>">
+            </div>
+        
+            <div class="form-group">
+                <label for="email">Email<sup>*</sup></label>
+                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
+                <div class="error-message" id="email-error"></div>
+            </div>  
+
+            <div class="form-group">   
+                <label for="password">Mot de passe<sup>*</sup></label>
+                <input type="password" id="password" name="password" placeholder="Laisser vide pour ne pas modifier">
+                <div class="error-message" id="password-error"></div>
+            </div>
+        
+            <div class="form-group">
+                <label for="telephone">Téléphone</label>
+                <input type="text" id="telephone" name="telephone" value="<?php echo htmlspecialchars($user['telephone'] ?? ''); ?>">
+            </div>
+            
+            <div class="form-group">
+                <label for="adresse">Adresse</label>
+                <input type="text" id="adresse" name="adresse" value="<?php echo htmlspecialchars($user['adresse'] ?? ''); ?>">
+            </div>
+            
+            <div class="form-group">
+                <label for="date_naissance">Date de naissance</label>
+                <input type="date" id="date_naissance" name="date_naissance" value="<?php echo htmlspecialchars($user['date_naissance'] ?? ''); ?>">
+            </div>
+            
+            <div class="form-group">
+                <label for="credits">Crédits</label>
+                <div class="credits-container">
+                    <input type="text" id="credits" name="credits" value="<?php echo htmlspecialchars($user['credits'] ?? '0'); ?>" readonly>
+                </div>
+            </div>
                 
-        <div class="form-actions">
-            <input type="hidden" name="update_personal_data" value="1">
-            <button type="submit" class="btn btn-primary">Sauvegarder les modifications</button>
+            <div class="form-note">
+                <p><sup>*</sup> Champs obligatoires</p>
+            </div>
+            
+            <div class="form-actions">
+                <input type="hidden" name="update_personal_data" value="1">
+                <button type="submit" class="btn btn-primary">Sauvegarder les modifications</button>
+            </div>
         </div>
     </form>
 </div>
-                    
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Validation du formulaire lors de la soumission
-        document.getElementById('personalDataForm').addEventListener('submit', function(e) {
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion du bouton "Modifier"
+    const editBtn = document.getElementById('editPersonalDataBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const displayDiv = document.getElementById('personalDataDisplay');
+    const editFormDiv = document.getElementById('personalDataEditForm');
+    const form = document.querySelector('.vehicles-section form');
+    
+    if (editBtn && displayDiv && editFormDiv) {
+        editBtn.addEventListener('click', function() {
+            console.log('Bouton Modifier cliqué'); // Debug
+            displayDiv.style.display = 'none';
+            editFormDiv.style.display = 'block';
+        });
+    }
+    
+    // Validation du formulaire lors de la soumission
+    if (form) {
+        form.addEventListener('submit', function(e) {
             let hasError = false;
             
             // Vérification des champs obligatoires
             const pseudo = document.getElementById('pseudo');
             const email = document.getElementById('email');
-            
+        
             // Validation du pseudo
-            if (!pseudo.value.trim()) {
+            if (pseudo && !pseudo.value.trim()) {
                 document.getElementById('pseudo-error').textContent = 'Le pseudo est obligatoire.';
                 pseudo.classList.add('error');
                 hasError = true;
-            } else {
+            } else if (pseudo) {
                 document.getElementById('pseudo-error').textContent = '';
                 pseudo.classList.remove('error');
             }
-            
+        
             // Validation de l'email
-            if (!email.value.trim()) {
+            if (email && !email.value.trim()) {
                 document.getElementById('email-error').textContent = 'L\'email est obligatoire.';
                 email.classList.add('error');
                 hasError = true;
-            } else if (!isValidEmail(email.value.trim())) {
+            } else if (email && !isValidEmail(email.value.trim())) {
                 document.getElementById('email-error').textContent = 'Veuillez entrer une adresse email valide.';
                 email.classList.add('error');
                 hasError = true;
-            } else {
+            } else if (email) {
                 document.getElementById('email-error').textContent = '';
                 email.classList.remove('error');
             }
-            
+        
             if (hasError) {
                 e.preventDefault(); // Empêcher l'envoi du formulaire en cas d'erreurs
             }
         });
-        
-        // Fonction pour vérifier le format de l'email
-        function isValidEmail(email) {
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return regex.test(email);
-        }
-        
-        // Effacement du message d'erreur lors de la mise au point sur un champ
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                const errorId = this.id + '-error';
-                const errorElement = document.getElementById(errorId);
-                if (errorElement) {
-                    errorElement.textContent = '';
-                }
-                this.classList.remove('error');
-            });
+    }
+    
+    // Fonction pour vérifier le format de l'email
+    function isValidEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    }
+    
+    // Effacement du message d'erreur lors de la mise au point sur un champ
+    document.querySelectorAll('#personalDataEditForm input').forEach(input => {
+        input.addEventListener('focus', function() {
+            const errorId = this.id + '-error';
+            const errorElement = document.getElementById(errorId);
+            if (errorElement) {
+                errorElement.textContent = '';
+            }
+            this.classList.remove('error');
         });
     });
+});
 </script>

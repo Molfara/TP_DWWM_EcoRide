@@ -1050,7 +1050,7 @@ footer {
 }
 
 .photo-controls button:hover {
-    background-color: #007ACC;
+    background-color: #007ACC !important;
 }
 
 /* Input de fichier caché */
@@ -1267,6 +1267,153 @@ footer {
         padding-bottom: 10px; /* Espace pour le bouton */
     }
 
+}
+
+/* =========================
+   STYLES POUR LA SECTION PROFIL de CHAUFFEUR
+   ========================= */
+
+   /* En-tête avec bouton de suppression */
+.vehicle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.vehicle-header h3 {
+    margin: 0;
+}
+
+/* Style pour le bouton de suppression */
+.btn-danger {
+    background-color: #F44336; /* Couleur rouge pour distinguer l'action de suppression */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px; /* Légèrement plus petit que la search-button */
+    cursor: pointer;
+    font-size: 16px; /* Légèrement plus petit que la search-button */
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: #dc3545; /* Couleur plus foncée au survol */
+}
+
+/* Conteneur pour placer les formulaires côte à côte */
+.profile-forms-container {
+    display: flex;
+    flex-wrap: wrap; /* Permet aux éléments de passer à la ligne si nécessaire */
+    gap: 70px; /* Espacement entre les formulaires */
+    justify-content: center; /* Centrage horizontal */
+    align-items: flex-start; /* Alignement en haut */
+    max-width: 1200px; /* Largeur maximale du conteneur */
+    margin: 0 auto; /* Centrage du conteneur lui-même */
+    padding: 20px;
+ }
+ 
+ /* Chaque formulaire occupe une largeur égale */
+ .personal-data-section,
+ .vehicles-section {
+    flex: 1; /* Largeur égale pour les deux formulaires */
+    max-width: 400px; /* Largeur maximale de chaque formulaire */
+    min-width: 250px; /* Largeur minimale de chaque formulaire */
+    background-color: #fff; /* Fond blanc */
+    border-radius: 8px; /* Coins arrondis */
+    padding: 20px 25px; /* Marge intérieure */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombre extérieure douce */
+    margin-bottom: 10; /* Marge en bas */
+ }
+
+ .data-item {
+    margin-bottom: 15px; /* Augmente l'espace entre les lignes */
+    padding: 10px 0; /* Ajoute des marges intérieures */
+    border-bottom: 1px solid #f0f0f0; /* Bordure séparatrice (optionnelle) */
+ }
+ 
+ .data-item:last-child {
+    border-bottom: none;
+    margin-bottom: 20px; /* Espace avant le bouton */
+ }
+ 
+ .data-label {
+    font-weight: bold;
+    color: #333;
+    display: inline-block;
+    width: 150px;
+    margin-bottom: 5px; /* Espace entre le libellé et la valeur */
+ }
+ 
+ .data-value {
+    color: #666;
+    line-height: 1.5; /* Augmente l'interligne */
+ }
+
+ #editPersonalDataBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #0099FF; /* Couleur bleue */
+    color: white;  
+    border: none; 
+    border-radius: 4px;
+    cursor: pointer;   
+    font-size: 18px;
+    transition: background-color 0.3s ease;  
+}
+ 
+#editPersonalDataBtn:hover {
+    background-color: #007ACC; /* Plus foncé au survol */
+}
+ 
+/* Styles pour les boutons Modifier et Ajouter dans la section véhicules */
+.vehicle-actions button {
+    background-color: #0099FF !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 12px 70px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+    width: auto;
+    margin: 0;
+}
+
+.vehicle-actions button:hover {
+    background-color: #007ACC !important;
+}
+
+/* Espacement entre les boutons */
+.vehicle-actions {
+    display: flex;
+    gap: 20px; /* Espace entre les boutons */
+    justify-content: center; /* Centrer les boutons */
+    margin-top: 20px;
+}
+
+ /* Responsive pour tablettes et appareils mobiles */
+ @media (max-width: 768px) {
+    .profile-forms-container {
+        flex-direction: column; /* Disposition verticale sur mobile */
+        align-items: center;
+    }
+    
+    .personal-data-section,
+    .vehicles-section {
+        max-width: 100%;
+        max-width: 350px;
+    }
+ }
+
+ /* Ajustements pour les bouttons Modifier et Ajouter pour les écrans moyens */
+@media (max-width: 768px) {
+    .vehicle-actions button {
+        padding: 12px 40px; /* Padding réduit sur écrans moyens */
+        font-size: 16px; /* Taille de police légèrement réduite */
+    }
 }
 
 
