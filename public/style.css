@@ -1417,6 +1417,289 @@ footer {
 }
 
 
+/* =========================
+   STYLES POUR LA SECTION PROPOSER UN TRAJET
+   ========================= */
+
+/* Conteneur pour isoler les styles uniquement sur la page de proposition de trajet */
+.page-proposer-trajet {
+
+    /* Conteneur pour placer les sections côte à côte */
+    .trip-forms-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 70px;
+        justify-content: center;
+        align-items: flex-start;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    /* Chaque section occupe une largeur égale */
+    .trip-params-section,
+    .vehicle-container {
+        flex: 1;
+        max-width: 400px;
+        min-width: 250px;
+        background-color: #fff; /* Fond blanc */
+        border-radius: 8px; /* Coins arrondis */
+        padding: 20px 25px; /* Marge intérieure */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombre extérieure douce */
+        margin-bottom: 10px;
+        min-height: 500px; /* Augmenté pour accommoder le header */
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Styles pour les titres des sections - INCLUS dans le bloc blanc */
+    .trip-params-section h2,
+    .vehicle-container h2,
+    .vehicle-title {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 0px;
+        text-align: center;
+        margin-top: 0; /* Supprime la marge du haut */
+    }
+    
+    /* Styles pour les descriptions des sections - INCLUS dans le bloc blanc */
+    .trip-params-section p,
+    .vehicle-container p,
+    .vehicle-subtitle {
+        color: #666;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    /* Styles pour les groupes de champs de formulaire - label et input sur la même ligne */
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 15px; /* Espacement entre label et input */
+    }
+    
+    .form-group label {
+        font-weight: bold !important;
+        color: #333 !important;
+        min-width: 150px; /* Largeur fixe pour aligner les inputs */
+        margin-bottom: 0; /* Supprime la marge du bas */
+        flex-shrink: 0; /* Empêche le label de rétrécir */
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        flex: 1; /* Prend tout l'espace restant */
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #0099FF;
+        box-shadow: 0 0 3px rgba(0, 153, 255, 0.3);
+    }
+    
+    /* Style spécial pour le prix avec unité */
+    .form-group.price-group {
+        align-items: center;
+    }
+    
+    .price-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+    }
+    
+    .price-input input {
+        flex: 1;
+        max-width: 120px; /* Limite la largeur du champ prix */
+    }
+    
+    .currency {
+        color: #666;
+        font-weight: normal;
+        white-space: nowrap;
+    }
+    
+    /* Note explicative */
+    .form-note {
+        margin: 0px 0;
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .form-note p {
+        margin: 0;
+    }
+    
+    /* Conteneur pour centrer le bouton "Changer la voiture" */
+    .action-buttons {
+        display: flex;
+        justify-content: center; /* Centre le bouton horizontalement */
+        margin-top: 20px;
+        width: 100%;
+    }
+    
+    /* Style pour le bouton "Changer la voiture" uniquement */
+    .action-buttons .btn,
+    .action-buttons button {
+        background-color: #0099FF !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 4px;
+        padding: 12px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: normal;
+        transition: background-color 0.3s ease;
+        width: 50%; /* Sur toute la largeur */
+        margin: 0;
+        margin-bottom: 10px;
+    }
+    
+    .action-buttons .btn:hover,
+    .action-buttons button:hover {
+        background-color: #007ACC !important;
+    }
+    
+    /* Style pour le bouton "Choisir" */
+    .btn-choisir {
+        background-color: #0099FF; /* Couleur bleue pour l'action de sélection */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px; /* Même taille que le bouton Supprimer */
+        cursor: pointer;
+        font-size: 16px; /* Même taille que le bouton Supprimer */
+        font-weight: normal;
+        transition: background-color 0.3s ease;
+    }
+    
+    
+    .btn-choisir:hover {
+        background-color: #007ACC; /* Couleur plus foncée au survol */
+    }
+    
+    /* Style pour le conteneur du bouton "Proposer ce trajet" */
+    .proposer-trajet-container {
+        display: flex !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        margin: 30px auto !important; /* Marge en haut et en bas */
+        background-color: #fff; /* Fond blanc */
+        border-radius: 8px; /* Coins arrondis */
+        padding: 20px; /* Espacement intérieur */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre extérieure douce */
+        max-width: 300px; /* Largeur maximale du conteneur */
+    }
+    
+    /* Style du bouton "Proposer ce trajet" */
+    .btn-proposer-trajet {
+        width: 100%;
+        max-width: 300px;
+        padding: 12px 50px;
+        background-color: #0099FF;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        min-width: 300px;
+    }
+    
+    /* Style au survol du bouton "Proposer ce trajet" */
+    .btn-proposer-trajet:hover {
+        background-color: #007ACC;
+    }
+    
+    /* Tablettes (écrans moyens) */
+    @media (max-width: 768px) {
+        .trip-forms-container {
+            flex-direction: column !important;
+            gap: 30px !important;
+            padding: 15px !important;
+            max-width: 100% !important; /* Changé de 80% à 100% */
+            align-items: stretch !important;
+            justify-content: flex-start !important; /* Évite le centrage qui pousse à droite */
+        }
+        
+        .trip-params-section,
+        .vehicle-container {
+            max-width: 100% !important;
+            min-width: auto !important;
+            width: 100% !important;
+            margin: 0 !important; /* Supprime margin: 0 auto */
+            flex: none !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Ajustements pour les groupes de formulaire */
+        .form-group {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            margin-bottom: 20px !important;
+        }
+        
+        .form-group label {
+            min-width: auto !important;
+            margin-bottom: 5px !important;
+            width: 100% !important;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .price-input {
+            width: 100% !important;
+            justify-content: flex-start !important;
+        }
+        
+        .price-input input {
+            max-width: 150px !important;
+        }
+        
+        /* Bouton "Changer la voiture" */
+        .action-buttons .btn,
+        .action-buttons button {
+            width: 40% !important;
+            padding: 14px !important;
+            font-size: 16px !important;
+        }
+        
+        /* Conteneur du bouton "Proposer ce trajet" */
+        .proposer-trajet-container {
+            max-width: 100% !important;
+            margin: 20px 15px !important;
+            padding: 15px !important;
+            text-align: center !important;
+        }
+        
+        .btn-proposer-trajet {
+            min-width: auto !important;
+            width: 100% !important;
+            max-width: 80% !important;
+            margin: 0 auto !important;
+        }
+    }
+    
+} /* Fin de .page-proposer-trajet */
+
+
 /* Styles pour la page de contact */
 /* Section d'informations de contact */
 .container h2 {
@@ -1877,7 +2160,7 @@ textarea.form-control {
     border-radius: 50%; /* Forme ronde */
 }
 
-/* Point vert pour le départ */
+/* Point blue pour le départ */
 .departure:before {
     background-color: #0099FF;
 }

@@ -100,6 +100,11 @@ $routes = [
    'handler' => 'pages/espace_chauffeur.php'
 ],
 
+  // Route pour proposer un trajet
+  'proposer-trajet' => [
+    'middleware' => 'checkAuth',
+    'handler' => 'pages/proposer-trajet.php'
+],
 
  // Route pour ajouter la première voiture
 'ajouter-voiture' => [
