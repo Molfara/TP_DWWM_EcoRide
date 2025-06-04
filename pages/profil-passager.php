@@ -116,7 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_photo'])) {
             <a href="role" class="btn btn-white">Changer pour chauffeur</a>
         </div>
     </div>
-    
+
+    <div class="page-profil-passager">
+
     <!-- Добавить этот код после закрывающего div hero -->
     <div class="profile-section">
 <!-- Titre principal de la page -->
@@ -162,10 +164,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_photo'])) {
     </form>
 </div>
 
-        
+   
         <div id="uploadMessage" class="upload-message"></div>
     </div>
-    
+
     <script>
     function previewAndUpload(input) {
         if (input.files && input.files[0]) {
@@ -213,9 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_photo'])) {
     }
             
     </script>
-</main>
-</body>
-</html>
+
 
 <!-- Section Mes données personnelles -->
 <div class="vehicles-section" style="max-width: 600px; margin: 0 auto;">
@@ -432,3 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+</main>
+</body>
+</html>

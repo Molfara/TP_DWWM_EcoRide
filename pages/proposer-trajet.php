@@ -6,7 +6,7 @@ require_once __DIR__ . '/../middleware/auth.php';
 // Vérification si l'utilisateur est connecté et a le rôle de chauffeur
 // Si non, redirection vers la page de connexion
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'chauffeur') {
-    header('Location: connexion.php');
+    header('Location: connexion');
     exit;
 }
 
@@ -95,7 +95,7 @@ try {
             <p>Complétez les infos de votre prochain trajet</p>
         </div>
         
-        <form id="tripForm" method="POST" action="process-trip.php">
+        <form id="tripForm" method="POST" action="/proposer-trajet">
 
                 <!-- Date et heure de départ -->
                 <div class="form-group">
@@ -145,6 +145,10 @@ try {
             <div class="form-note">
                 <p><strong>*</strong> Veuillez noter que 2 crédits sont prélevés par la plateforme pour assurer la qualité du service et la sécurité des transactions.</p>
             </div>
+
+            <!-- Champ caché pour stocker l'ID du véhicule sélectionné - IMPORTANT: déplacé dans le formulaire -->
+        <input type="hidden" id="selected_vehicle_id" name="selected_vehicle_id" 
+            value="<?php echo !empty($vehicules) ? $vehicules[0]['voiture_id'] : ''; ?>">
         </form>
     </div>
 
@@ -300,10 +304,7 @@ try {
             </div>
         <?php endforeach; ?>
     </div>
-    
-    <!-- Champ caché pour stocker l'ID du véhicule sélectionné -->
-    <input type="hidden" id="selected_vehicle_id" name="selected_vehicle_id" 
-           value="<?php echo !empty($vehicules) ? $vehicules[0]['voiture_id'] : ''; ?>">
+
 </div>
 
 </div> 

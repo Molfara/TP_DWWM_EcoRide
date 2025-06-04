@@ -34,6 +34,12 @@ if ($request === 'traitement/process-car.php' && $method === 'POST') {
     exit; // Très important - arrête l'exécution ici
 }
 
+// Vérification pour process-trip.php
+if ($request === 'traitement/process-trip.php' && $method === 'POST') {
+    require __DIR__ . '/../traitement/process-trip.php';
+    exit; // Très important - arrête l'exécution ici
+}
+
 // Vérification pour profil-passager.php
 if ($request === 'traitement/profil-utilisateur.php' && $method === 'POST') {
     require __DIR__ . '/../traitement/profil-utilisateur.php';
@@ -49,6 +55,14 @@ $api_routes = [
 if (array_key_exists($request, $api_routes)) {
     require __DIR__ . '/../' . $api_routes[$request];
     exit; // Très important
+}
+
+// Gestion spéciale pour la route proposer-trajet en POST
+if ($request === 'proposer-trajet' && $method === 'POST') {
+    require_once __DIR__ . '/../middleware/auth.php';
+    checkAuth(); // Vérifier l'authentification
+    require __DIR__ . '/../traitement/propose-trip.php';
+    exit; // Important - arrête l'exécution ici
 }
 
 // À partir d'ici, on inclut le header pour les routes qui affichent des pages
@@ -100,7 +114,7 @@ $routes = [
    'handler' => 'pages/espace_chauffeur.php'
 ],
 
-  // Route pour proposer un trajet
+  // Route pour proposer un trajet (seulement GET, POST est géré au-dessus)
   'proposer-trajet' => [
     'middleware' => 'checkAuth',
     'handler' => 'pages/proposer-trajet.php'
@@ -112,31 +126,46 @@ $routes = [
     'handler' => 'pages/ajouter-voiture.php'
 ],
 
+  // Route pour les trajets de chauffeur
+'trajets-chauffeur' => [
+    'middleware' => 'checkAuth',
+    'handler' => 'pages/trajets-chauffeur.php'
+],
+
 ];
      
 // Logique de routage 
 if (array_key_exists($request, $routes)) {
-   $route = $routes[$request];
+    $route = $routes[$request];
  
-   // Vérification du middleware si présent
-   if (isset($route['middleware'])) {
-       require_once __DIR__ . '/../middleware/auth.php';
-       // Vérifiez le nom du middleware et appelez la fonction correspondante
-       if ($route['middleware'] === 'checkAuth') {
-           checkAuth();
-       } else if ($route['middleware'] === 'checkAdmin') {
-           checkAdmin();
-       }
-       require __DIR__ . '/../' . $route['handler'];
-   }
-   // Traitement des routes avec méthodes GET/POST
-   else if (is_array($route) && !isset($route['handler'])) {
-       require __DIR__ . '/../' . $route[$method];
-   }
-   // Traitement des routes simples
-   else {
-       require __DIR__ . '/../' . $route;
-   }
+    // Si la route a une structure GET/POST, récupérer la route pour la méthode HTTP
+    if (isset($route[$method])) {
+        $route = $route[$method];
+    }
+    
+    // Vérification du middleware si présent
+    if (isset($route['middleware'])) {
+        require_once __DIR__ . '/../middleware/auth.php';
+        // Vérifiez le nom du middleware et appelez la fonction correspondante
+        if ($route['middleware'] === 'checkAuth') {
+            checkAuth();
+        } else if ($route['middleware'] === 'checkAdmin') {
+            checkAdmin();
+        }
+        require __DIR__ . '/../' . $route['handler'];
+    }
+    // Si c'est un string simple (ancien format)
+    else if (is_string($route)) {
+        require __DIR__ . '/../' . $route;
+    }
+    // Traitement des routes avec méthodes GET/POST (nouveau format)
+    else if (is_array($route) && !isset($route['handler']) && !isset($route['middleware'])) {
+        require __DIR__ . '/../' . $route[$method];
+    }
+    // Traitement direct du handler
+    else if (isset($route['handler'])) {
+        require __DIR__ . '/../' . $route['handler'];
+    }
 } else {
    // Route non trouvée
    http_response_code(404);

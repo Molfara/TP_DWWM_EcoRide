@@ -1115,6 +1115,12 @@ footer {
     font-size: 16px;
 }
 
+.page-profil-passager .personal-data-section,
+.page-profil-passager .vehicles-section {
+    box-shadow: none !important;
+    border: none !important;
+}
+
 /* Responsive design pour la section profil */
 @media (max-width: 768px) {
     .profile-photo {
@@ -1269,9 +1275,23 @@ footer {
 
 }
 
+/* Suppression uniquement du cadre/ombre extérieur pour la page profil-passager */
+.page-profil-passager .vehicles-section {
+    box-shadow: none !important;
+    border: none !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+/* Conservation de la mise en forme habituelle pour tous les autres éléments */
+.page-profil-passager .personal-data-section {
+    /* Les styles restent inchangés */
+}
+
 /* =========================
    STYLES POUR LA SECTION PROFIL de CHAUFFEUR
-   ========================= */
+   ========================= */ 
 
    /* En-tête avec bouton de suppression */
 .vehicle-header {
@@ -1699,6 +1719,220 @@ footer {
     
 } /* Fin de .page-proposer-trajet */
 
+
+/* =========================
+   STYLES POUR LA SECTION TRAJETS du CHAUFFEUR
+   ========================= */
+
+   /* Conteneur pour placer les sections côte à côte (comme profile-forms-container) */
+.trip-forms-container {
+    display: flex;
+    flex-wrap: wrap; /* Permet aux éléments de passer à la ligne si nécessaire */
+    gap: 70px; /* Espacement entre les sections */
+    justify-content: center; /* Centrage horizontal */
+    align-items: flex-start; /* Alignement en haut */
+    max-width: 1200px; /* Largeur maximale du conteneur */
+    margin: 0 auto; /* Centrage du conteneur lui-même */
+    padding: 20px;
+}
+
+/* Chaque section occupe une largeur égale (comme personal-data-section et vehicles-section) */
+.form-section {
+    flex: 1; /* Largeur égale pour les deux sections */
+    max-width: 400px; /* Largeur maximale de chaque section */
+    min-width: 250px; /* Largeur minimale de chaque section */
+    background-color: #fff; /* Fond blanc */
+    border-radius: 8px; /* Coins arrondis */
+    padding: 20px 25px; /* Marge intérieure */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombre extérieure douce */
+    margin-bottom: 10px; /* Marge en bas */
+}
+
+/* Section trajet en cours - apparaît seule en haut */
+.form-section:not(.trip-forms-container .form-section) {
+    max-width: 500px; /* Plus large pour le trajet en cours */
+    margin: 20px auto; /* Centré horizontalement */
+}
+
+
+/* Container pour le bouton "Proposer un nouveau trajet" */
+.nouveau-trajet-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+/* === STYLES POUR LES ROUTES (identiques à la page covoiturage) === */
+
+/* Section du trajet avec départ et arrivée (équivalent à .ride-route) */
+.trip-route-current,
+.trip-route-upcoming,
+.trip-route-history {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem; /* Espace pour la ligne verticale et les marqueurs */
+}
+
+/* Ligne verticale entre les points de départ et d'arrivée */
+.trip-route-current:before,
+.trip-route-upcoming:before,
+.trip-route-history:before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e0e0e0;
+}
+
+/* Style pour lieu de départ et d'arrivée (équivalent à .departure, .destination) */
+.lieu-depart,
+.lieu-arrivee {
+    position: relative;
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Points indicateurs pour départ et arrivée */
+.lieu-depart:before,
+.lieu-arrivee:before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%; /* Forme ronde */
+}
+
+/* Point bleu pour le départ */
+.lieu-depart:before {
+    background-color: #0099FF;
+}
+
+/* Point rouge pour l'arrivée */
+.lieu-arrivee:before {
+    background-color: #F44336;
+}
+
+/* Conteneur pour le bouton nouveau trajet */
+.nouveau-trajet-container {
+    display: flex; 
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    margin: 30px auto !important; /* Marge en haut et en bas */
+    background-color: #fff; /* Fond blanc */
+    border-radius: 8px; /* Coins arrondis */
+    padding: 20px; /* Espacement intérieur */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre extérieure douce */
+    max-width: 250px; /* Largeur maximale du conteneur */
+}
+
+/* Styles pour le bouton nouveau trajet */
+.nouveau-trajet-container button {
+    background-color: 
+#0099FF !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+    width: auto;
+    margin: 0;
+}
+
+.nouveau-trajet-container button:hover {
+    background-color: 
+#007ACC !important;
+}
+
+/* Conteneur pour les boutons d'actions */
+.trip-actions {
+    display: flex; 
+    justify-content: center; /* centrage des boutons */
+    gap: 25px; /* espacement entre les boutons */
+    margin-top: 20px; /* espacement du haut si nécessaire */
+    margin-bottom: 40px; /* plus d'espacement vers le bas */
+}
+
+/* Styles spécifiquement pour le bouton "Commencer le trajet" (btn-primary) */
+.trip-actions .btn-primary {
+    background-color: #0099FF !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+    width: auto;
+    margin: 0;
+}
+
+.trip-actions .btn-primary:hover {
+    background-color: #007ACC !important;
+}
+
+/* Styles spécifiquement pour le bouton "Terminer le trajet" (btn-success) */
+.trip-actions .btn-success {
+    background-color: #0099FF !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+    width: auto;
+    margin: 0;
+}
+
+.trip-actions .btn-success:hover {
+    background-color: #007ACC !important;
+}
+
+/* Conteneur pour le bouton afficher plus */
+.load-more-container {
+    display: flex; 
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    margin: 30px auto !important; /* Marge en haut et en bas */
+    background-color: #fff; /* Fond blanc */
+    border-radius: 8px; /* Coins arrondis */
+    padding: 20px; /* Espacement intérieur */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre extérieure douce */
+    max-width: 300px; /* Largeur maximale plus grande pour le texte long */
+}
+
+/* Styles pour le bouton afficher plus */
+.load-more-container button {
+    background-color: #0099FF !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+    width: auto;
+    margin: 0;
+    white-space: nowrap; /* Empêche le retour à la ligne dans le bouton */
+}
+
+.load-more-container button:hover {
+    background-color: #007ACC !important;
+}
 
 /* Styles pour la page de contact */
 /* Section d'informations de contact */

@@ -68,7 +68,7 @@ session_start();
                 <ul class="dropdown-menu user-menu">
                     <li><a href="/profil-chauffeur">Mon profil</a></li>
                     <li><a href="/espace-chauffeur">Mon espace</a></li>
-                    <li><a href="/mes-trajets">Mes trajets</a></li>
+                    <li><a href="/trajets-chauffeur">Mes trajets</a></li>
                     <li><a href="/proposer-trajet">Proposer un trajet</a></li>
                     <li><a href="/deconnexion.php">Déconnecter</a></li>
                 </ul>

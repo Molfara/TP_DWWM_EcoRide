@@ -3,7 +3,6 @@
 require_once '../config/database.php'; // Chemin vers votre fichier de configuration de base de données
 ?>
 
-
 <div class="hero-background">
     <div class="hero-content">
         <h1>Covoiturage Simple et Écolo</h1>
@@ -59,7 +58,7 @@ require_once '../config/database.php'; // Chemin vers votre fichier de configura
                 <label class="filter-label">Prix maximum</label>
                 <div class="price-slider-container">
                     <input type="range" min="0" max="20" value="10" class="price-slider" id="max-price">
-                    <span class="price-value" id="price-value">10  Credits</span>
+                    <span class="price-value" id="price-value">10 Credits</span>
                 </div>
             </div>
             <div class="filter-item">
@@ -102,13 +101,19 @@ require_once '../config/database.php'; // Chemin vers votre fichier de configura
             $date_depart = isset($_POST['date_depart']) ? $_POST['date_depart'] : '';
             $nb_passagers = isset($_POST['nb_passagers']) ? intval($_POST['nb_passagers']) : 1;
             
-            // Préparation de la requête SQL
-            $sql = "SELECT c.*, u.nom, u.prenom, v.modele, v.energie, v.couleur, m.libelle as marque
+            // Récupération des filtres si présents
+            $eco_filter = isset($_POST['eco_filter']) ? intval($_POST['eco_filter']) : 0;
+            $max_price = isset($_POST['max_price']) ? floatval($_POST['max_price']) : 20;
+            $max_duration = isset($_POST['max_duration']) ? intval($_POST['max_duration']) : 720;
+            $min_rating = isset($_POST['min_rating']) ? intval($_POST['min_rating']) : 0;
+            
+            // Préparation de la requête SQL - CORRIGÉE pour la nouvelle structure
+            $sql = "SELECT c.*, u.nom, u.prenom, u.utilisateur_id, v.modele, v.energie, v.couleur, m.libelle as marque
                    FROM covoiturage c
-                   INNER JOIN utilisateur u ON c.conducteur_id = u.utilisateur_id
+                   INNER JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
                    INNER JOIN voiture v ON c.voiture_id = v.voiture_id
                    INNER JOIN marque m ON v.marque_id = m.marque_id
-                   WHERE 1=1";
+                   WHERE u.role_id = 3"; // 3 = chauffeur selon votre table role
             
             $params = [];
             
@@ -132,6 +137,15 @@ require_once '../config/database.php'; // Chemin vers votre fichier de configura
             $sql .= " AND c.nb_place >= ?";
             $params[] = $nb_passagers;
             
+            // Filtre véhicule électrique
+            if ($eco_filter == 1) {
+                $sql .= " AND v.energie = 'Électrique'";
+            }
+            
+            // Filtre prix maximum
+            $sql .= " AND c.prix_personne <= ?";
+            $params[] = $max_price;
+            
             // Ordonner par date et heure de départ
             $sql .= " ORDER BY c.date_depart ASC, c.heure_depart ASC";
             
@@ -145,11 +159,16 @@ require_once '../config/database.php'; // Chemin vers votre fichier de configura
                 } else {
                     // Affichage des résultats
                     foreach ($covoiturages as $covoiturage) {
-                        // Calculer la note moyenne du conducteur
+                        // Calculer la note moyenne du conducteur - CORRIGÉ
                         $stmt = $pdo->prepare("SELECT AVG(note) as note_moyenne FROM avis WHERE utilisateur_id = ?");
-                        $stmt->execute([$covoiturage['conducteur_id']]);
+                        $stmt->execute([$covoiturage['utilisateur_id']]);
                         $note = $stmt->fetch(PDO::FETCH_ASSOC);
                         $note_moyenne = round($note['note_moyenne'] ?: 0, 1);
+                        
+                        // Appliquer le filtre de note minimale
+                        if ($note_moyenne < $min_rating) {
+                            continue; // Passer au covoiturage suivant si la note est insuffisante
+                        }
                         
                         // Afficher chaque covoiturage
                         ?>
