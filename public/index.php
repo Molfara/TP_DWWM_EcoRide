@@ -5,7 +5,8 @@ ob_start();
 
 
 // Récupérer l'URI de la requête et supprimer les slashes
-$request = trim($_SERVER['REQUEST_URI'], '/');
+$request_uri = $_SERVER['REQUEST_URI'];
+$request = trim(parse_url($request_uri, PHP_URL_PATH), '/');
 
 // Récupérer la méthode HTTP utilisée
 $method = $_SERVER['REQUEST_METHOD'];
@@ -37,6 +38,12 @@ if ($request === 'traitement/process-car.php' && $method === 'POST') {
 // Vérification pour process-trip.php
 if ($request === 'traitement/process-trip.php' && $method === 'POST') {
     require __DIR__ . '/../traitement/process-trip.php';
+    exit; // Très important - arrête l'exécution ici
+}
+
+// Vérification pour search-trip.php
+if ($request === 'traitement/search-trip.php' && ($method === 'GET' || $method === 'POST')) {
+    require __DIR__ . '/../traitement/search-trip.php';
     exit; // Très important - arrête l'exécution ici
 }
 

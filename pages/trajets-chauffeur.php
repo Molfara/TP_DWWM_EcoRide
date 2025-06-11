@@ -235,7 +235,7 @@ function displayPassagers($passagers) {
     <!-- Inclusion de la feuille de style principale -->
     <link rel="stylesheet" href="../public/style.css">
 </head>
-<body>
+<body class="page-trajets-chauffeur"> 
     <?php
     // Inclusion de l'en-tête commun du site
     include_once '../public/header.php';
