@@ -45,15 +45,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 // Fonction de recherche de trajets
-function searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $lieu_arrivee, $date_depart, $nb_passagers, $eco_filter, $max_price, $min_rating) {
+function searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $lieu_arrivee, $date_depart, $nb_passagers, $eco_filter, $max_price, $max_duration, $min_rating) {
     try {
         // RECHERCHE UNIVERSELLE POUR TOUS
         // Afficher tous les trajets disponibles en tenant compte du rôle de l'utilisateur
         
         if ($current_user_role === 3 && $current_user_id) {
             // CHAUFFEUR autorisé - afficher SES propres trajets + les trajets d'autres chauffeurs
-            $sql = "SELECT c.*, u.nom, u.prenom, u.utilisateur_id, v.modele, v.energie, v.couleur, m.libelle as marque,
+            $sql = "SELECT c.*, u.nom, u.prenom, u.pseudo, u.photo, u.utilisateur_id, v.modele, v.immatriculation, v.energie, v.couleur, m.libelle as marque,
                            (c.nb_place - COALESCE(reserved.places_reservees, 0)) as places_disponibles,
+                           (TIME_TO_SEC(c.heure_arrivee) - TIME_TO_SEC(c.heure_depart))/60 as duree_minutes,
                            CASE WHEN c.utilisateur_id = ? THEN 'own' ELSE 'other' END as trip_type
                    FROM covoiturage c
                    INNER JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
@@ -72,8 +73,9 @@ function searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $
             $params = [$current_user_id, $nb_passagers];
         } else {
             // PASSAGER, NON-AUTORISÉ OU AUTRES RÔLES - afficher les trajets de tous les chauffeurs
-            $sql = "SELECT c.*, u.nom, u.prenom, u.utilisateur_id, v.modele, v.energie, v.couleur, m.libelle as marque,
+            $sql = "SELECT c.*, u.nom, u.prenom, u.pseudo, u.photo, u.utilisateur_id, v.modele, v.immatriculation, v.energie, v.couleur, m.libelle as marque,
                            (c.nb_place - COALESCE(reserved.places_reservees, 0)) as places_disponibles,
+                           (TIME_TO_SEC(c.heure_arrivee) - TIME_TO_SEC(c.heure_depart))/60 as duree_minutes,
                            'other' as trip_type
                    FROM covoiturage c
                    INNER JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
@@ -142,6 +144,11 @@ function searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $
             if ($covoiturage['note_moyenne'] < $min_rating) {
                 unset($results[$key]);
             }
+
+            // Appliquer le filtre de durée maximale
+            if ($covoiturage['duree_minutes'] > $max_duration) {
+                unset($results[$key]);
+            }
         }
         
         return array_values($results);
@@ -153,7 +160,7 @@ function searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $
 
 // Exécuter la recherche
 try {
-    $search_results = searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $lieu_arrivee, $date_depart, $nb_passagers, $eco_filter, $max_price, $min_rating);
+    $search_results = searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $lieu_arrivee, $date_depart, $nb_passagers, $eco_filter, $max_price, $max_duration, $min_rating);
     
     // Sauvegarder les résultats et paramètres dans la session
     $_SESSION['search_results'] = $search_results;

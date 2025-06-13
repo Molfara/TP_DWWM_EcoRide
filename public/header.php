@@ -45,12 +45,43 @@ session_start();
             <!-- Afficher ceci pour les utilisateurs connectés -->
             <li class="dropdown user-profile">
 
-<span class="dropdown-toggle user-avatar">
-<?php if (isset($_SESSION['user_avatar']) && $_SESSION['user_avatar']): ?>
-    <img src="<?php echo htmlspecialchars($_SESSION['user_avatar']); ?>" alt="Profil">
+            <span class="dropdown-toggle user-avatar">
+<?php 
+if (isset($_SESSION['user_id'])) {
+    // Connexion à la base de données pour vérifier la présence d'un avatar
+    require_once __DIR__ . '/../config/database.php';
+    
+    $current_user_id = $_SESSION['user_id'];
+    $current_user_pseudo = $_SESSION['user_pseudo'] ?? 'U';
+    
+    // Récupération de la photo depuis la base de données
+    try {
+        $stmt_photo = $pdo->prepare("SELECT photo FROM utilisateur WHERE utilisateur_id = ?");
+        $stmt_photo->execute([$current_user_id]);
+        $user_photo = $stmt_photo->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user_photo && !empty($user_photo['photo'])): 
+            // Conversion du BLOB en base64 pour l'affichage
+            $image_data = base64_encode($user_photo['photo']);
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime_type = $finfo->buffer($user_photo['photo']);
+?>
+    <img src="data:<?php echo $mime_type; ?>;base64,<?php echo $image_data; ?>" alt="Profil">
 <?php else: ?>
-    <div class="avatar-placeholder"><?php echo htmlspecialchars(substr($_SESSION['user_pseudo'] ?? 'U', 0, 1)); ?></div>
-<?php endif; ?>
+    <div class="avatar-placeholder"><?php echo htmlspecialchars(strtoupper(substr($current_user_pseudo, 0, 1))); ?></div>
+<?php 
+        endif;
+    } catch (PDOException $e) {
+        // En cas d'erreur, affichage du placeholder
+        error_log("Erreur avatar header: " . $e->getMessage());
+?>
+    <div class="avatar-placeholder"><?php echo htmlspecialchars(strtoupper(substr($current_user_pseudo, 0, 1))); ?></div>
+<?php 
+    }
+} else { 
+?>
+    <div class="avatar-placeholder">U</div>
+<?php } ?>
 </span>
                 <!-- Menu différent selon le rôle -->
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'passager'): ?>

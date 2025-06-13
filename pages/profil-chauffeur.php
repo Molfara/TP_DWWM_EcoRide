@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <select id="energie_<?php echo $index; ?>" name="vehicules[<?php echo $index; ?>][energie]" required>
                             <option value="essence" <?php echo ($vehicule['energie'] ?? '') === 'essence' ? 'selected' : ''; ?>>Essence</option>
                             <option value="diesel" <?php echo ($vehicule['energie'] ?? '') === 'diesel' ? 'selected' : ''; ?>>Diesel</option>
-                            <option value="electrique" <?php echo ($vehicule['energie'] ?? '') === 'electrique' ? 'selected' : ''; ?>>Électrique</option>
+                            <option value="électrique" <?php echo ($vehicule['energie'] ?? '') === 'électrique' ? 'selected' : ''; ?>>Électrique</option>
                             <option value="hybride" <?php echo ($vehicule['energie'] ?? '') === 'hybride' ? 'selected' : ''; ?>>Hybride</option>
                         </select>
                     </div>

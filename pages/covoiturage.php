@@ -149,60 +149,129 @@ unset($_SESSION['search_results'], $_SESSION['search_params'], $_SESSION['search
             </div>
         <?php else: ?>
             <?php foreach ($search_results as $covoiturage): ?>
-                <div class="ride-card">
-                    <div class="ride-info">
-                        <div class="ride-header">
-                            <span class="ride-date"><?php echo date('d/m/Y', strtotime($covoiturage['date_depart'])); ?></span>
-                            <span class="ride-time"><?php echo $covoiturage['heure_depart']; ?></span>
-                        </div>
-                        <div class="ride-route">
-                            <div class="departure"><?php echo htmlspecialchars($covoiturage['lieu_depart']); ?></div>
-                            <div class="destination"><?php echo htmlspecialchars($covoiturage['lieu_arrivee']); ?></div>
-                        </div>
-                        <div class="ride-details">
-                            <div class="car-info">
-                                <span class="car-brand"><?php echo htmlspecialchars($covoiturage['marque']); ?></span>
-                                <span class="car-model"><?php echo htmlspecialchars($covoiturage['modele']); ?></span>
-                                <span class="car-energy"><?php echo htmlspecialchars($covoiturage['energie']); ?></span>
-                            </div>
-                            <div class="driver-info">
-                                <?php 
-                                $is_own_trip = isset($covoiturage['trip_type']) && $covoiturage['trip_type'] === 'own';
-                                if ($is_own_trip): 
-                                ?>
-                                    <span class="driver-name">Votre trajet</span>
-                                <?php else: ?>
-                                    <span class="driver-name"><?php echo htmlspecialchars($covoiturage['prenom'] . ' ' . substr($covoiturage['nom'], 0, 1) . '.'); ?></span>
-                                <?php endif; ?>
-                                <div class="driver-rating">
-                                    <?php 
-                                    for ($i = 1; $i <= 5; $i++) {
-                                        $starClass = $i <= $covoiturage['note_moyenne'] ? 'star active' : 'star';
-                                        echo '<span class="' . $starClass . '">★</span>';
-                                    }
-                                    ?>
-                                    <span class="rating-value">(<?php echo $covoiturage['note_moyenne']; ?>)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ride-price">
-                        <div class="price-amount"><?php echo number_format($covoiturage['prix_personne'], 2); ?> Credits</div>
-                        <div class="seats-available"><?php echo $covoiturage['places_disponibles']; ?> places disponibles</div>
+    <div class="ride-card">
+        <div class="ride-info">
+        <div class="ride-header">
+    <span class="ride-date"><?php echo date('d/m/Y', strtotime($covoiturage['date_depart'])); ?></span>
+    <span class="ride-time"><?php echo $covoiturage['heure_depart'] . ' - ' . $covoiturage['heure_arrivee']; ?></span>
+    <?php if (isset($covoiturage['energie']) && strtolower($covoiturage['energie']) === 'électrique'): ?>
+        <img src="images/icons/electric-car-icon.png" alt="Électrique" class="electric-car-icon">
+    <?php endif; ?>
+</div>
+            <div class="ride-route">
+                <div class="departure"><?php echo htmlspecialchars($covoiturage['lieu_depart']); ?></div>
+                <div class="destination"><?php echo htmlspecialchars($covoiturage['lieu_arrivee']); ?></div>
+            </div>
+            <div class="ride-details">
+                <div class="car-info">
+                    <span class="car-brand"><?php echo htmlspecialchars($covoiturage['marque']); ?></span>
+                    <span class="car-model"><?php echo htmlspecialchars($covoiturage['modele']); ?></span>
+                    <span class="car-immatriculation"><?php echo htmlspecialchars($covoiturage['immatriculation']); ?></span>
+                    <?php if (isset($covoiturage['couleur']) && !empty($covoiturage['couleur'])): ?>
+                          <span class="car-color"><?php echo htmlspecialchars($covoiturage['couleur']); ?></span>
+                    <?php endif; ?>
+                    <span class="car-energy"><?php echo htmlspecialchars($covoiturage['energie']); ?></span>
+                </div>
+            </div>
+            <div class="driver-info">
+                <?php 
+                $is_own_trip = isset($covoiturage['trip_type']) && $covoiturage['trip_type'] === 'own';
+                if ($is_own_trip): 
+                ?>
+                    <div class="driver-avatar">
+                        <?php 
+                        $photo = $covoiturage['photo'] ?? '';
+                        $pseudo = $covoiturage['pseudo'] ?? '';
+                        $prenom = $covoiturage['prenom'] ?? '';
                         
-                        <?php if (!$current_user_id): ?>
-                            <!-- Utilisateur non connecté -->
-                            <a href="../pages/connexion.php" class="book-button">Se connecter pour réserver</a>
-                        <?php elseif ($is_own_trip): ?>
-                            <!-- Trajet personnel -->
-                            <a href="modifier_trajet.php?id=<?php echo $covoiturage['covoiturage_id']; ?>" class="book-button" style="background-color: #FFA500;">Modifier</a>
-                        <?php else: ?>
-                            <!-- Trajet d'un autre chauffeur -->
-                            <a href="reservation.php?id=<?php echo $covoiturage['covoiturage_id']; ?>" class="book-button">Réserver</a>
+                        if (!empty($photo)): 
+                            // Conversion du BLOB en base64 pour l'affichage
+                            $image_data = base64_encode($photo);
+                            $finfo = new finfo(FILEINFO_MIME_TYPE);
+                            $mime_type = $finfo->buffer($photo);
+                        ?>
+                            <img src="data:<?php echo $mime_type; ?>;base64,<?php echo $image_data; ?>" alt="Avatar">
+                        <?php else: 
+                            $initial = '';
+                            if (!empty($pseudo)) {
+                                $initial = strtoupper(substr($pseudo, 0, 1));
+                            } elseif (!empty($prenom)) {
+                                $initial = strtoupper(substr($prenom, 0, 1));
+                            }
+                        ?>
+                            <div class="avatar-placeholder"><?php echo $initial; ?></div>
                         <?php endif; ?>
                     </div>
-                </div>
-            <?php endforeach; ?>
+                    <div class="driver-details">
+                        <span class="driver-name">Mon trajet</span>
+                    </div>
+                <?php else: ?>
+                    <div class="driver-avatar">
+                        <?php 
+                        $photo = $covoiturage['photo'] ?? '';
+                        $pseudo = $covoiturage['pseudo'] ?? '';
+                        $prenom = $covoiturage['prenom'] ?? '';
+                        
+                        if (!empty($photo)): 
+                            // Conversion du BLOB en base64 pour l'affichage
+                            $image_data = base64_encode($photo);
+                            $finfo = new finfo(FILEINFO_MIME_TYPE);
+                            $mime_type = $finfo->buffer($photo);
+                        ?>
+                            <img src="data:<?php echo $mime_type; ?>;base64,<?php echo $image_data; ?>" alt="Avatar">
+                        <?php else: 
+                            $initial = '';
+                            if (!empty($pseudo)) {
+                                $initial = strtoupper(substr($pseudo, 0, 1));
+                            } elseif (!empty($prenom)) {
+                                $initial = strtoupper(substr($prenom, 0, 1));
+                            }
+                        ?>
+                            <div class="avatar-placeholder"><?php echo $initial; ?></div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="driver-details">
+                        <span class="driver-name"><?php                                        
+                            $prenom = $covoiturage['prenom'] ?? '';
+                            $nom = $covoiturage['nom'] ?? '';
+                            $pseudo = $covoiturage['pseudo'] ?? '';
+                            
+                            if (!empty($prenom) && !empty($nom)) {
+                                echo htmlspecialchars($prenom . ' ' . substr($nom, 0, 1) . '.');
+                            } else {
+                                echo htmlspecialchars($pseudo);
+                            }
+                        ?></span>
+                        <div class="driver-rating">
+                            <?php 
+                            for ($i = 1; $i <= 5; $i++) {
+                                $starClass = $i <= $covoiturage['note_moyenne'] ? 'star active' : 'star';
+                                echo '<span class="' . $starClass . '">★</span>';
+                            }
+                            ?>
+                            <span class="rating-value">(<?php echo $covoiturage['note_moyenne']; ?>)</span>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="ride-price">
+            <div class="price-amount"><?php echo number_format($covoiturage['prix_personne'], 2); ?> Credits</div>
+            <div class="seats-available"><?php echo $covoiturage['places_disponibles']; ?> places disponibles</div>
+            
+            <?php if (!$current_user_id): ?>
+                <!-- Utilisateur non connecté -->
+                <a href="connexion" class="connect-button">Se connecter pour réserver</a>
+            <?php elseif ($is_own_trip): ?>
+                <!-- Trajet personnel -->
+                <a href="trajets-chauffeur" class="book-button">Regarder mes trajets</a>
+            <?php else: ?>
+                <!-- Trajet d'un autre chauffeur -->
+                <a href="reservation.php?id=<?php echo $covoiturage['covoiturage_id']; ?>" class="book-button">Réserver</a>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endforeach; ?>
         <?php endif; ?>
     </div>
 </div>
