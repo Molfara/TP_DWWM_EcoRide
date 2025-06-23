@@ -2,6 +2,13 @@
 // pages/covoiturage.php
 require_once '../config/database.php';
 
+// Récupération du message d'erreur s'il existe
+$error_message = '';
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message'];
+    unset($_SESSION['error_message']); // Supprimer le message après affichage
+}
+
 // Récupérer les résultats de recherche depuis la session
 $search_results = $_SESSION['search_results'] ?? [];
 $search_params = $_SESSION['search_params'] ?? [];
@@ -136,19 +143,28 @@ unset($_SESSION['search_results'], $_SESSION['search_params'], $_SESSION['search
 <!-- Section pour afficher les résultats des covoiturages -->
 <div class="container rides-section">
     <h2>Covoiturages disponibles</h2>
-    <div id="rides-results">
-        <?php if ($search_error): ?>
-            <div class="no-results-message">Erreur : <?php echo htmlspecialchars($search_error); ?></div>
-        <?php elseif (empty($search_results)): ?>
-            <div class="no-results-message">
-                <?php if (!empty($lieu_depart) || !empty($lieu_arrivee)): ?>
-                    Aucun trajet ne correspond à votre recherche.
-                <?php else: ?>
-                    Utilisez la barre de recherche pour trouver des covoiturages.
-                <?php endif; ?>
-            </div>
-        <?php else: ?>
-            <?php foreach ($search_results as $covoiturage): ?>
+<!-- Affichage des messages d'erreur -->
+<?php if (!empty($error_message)): ?>
+<div class="alert alert-danger">
+    <?= htmlspecialchars($error_message) ?>
+</div>
+<?php endif; ?>
+    
+<div id="rides-results">
+    <?php if (!empty($error_message)): ?>
+<!-- En cas d’erreur, ne rien afficher -->
+<?php elseif ($search_error): ?>
+        <div class="no-results-message">Erreur : <?php echo htmlspecialchars($search_error); ?></div>
+    <?php elseif (empty($search_results)): ?>
+        <div class="no-results-message">
+            <?php if (!empty($lieu_depart) || !empty($lieu_arrivee)): ?>
+                Aucun trajet ne correspond à votre recherche.
+            <?php else: ?>
+                Utilisez la barre de recherche pour trouver des covoiturages.
+            <?php endif; ?>
+        </div>
+    <?php else: ?>
+        <?php foreach ($search_results as $covoiturage): ?>
     <div class="ride-card">
         <div class="ride-info">
         <div class="ride-header">
@@ -242,15 +258,22 @@ unset($_SESSION['search_results'], $_SESSION['search_params'], $_SESSION['search
                                 echo htmlspecialchars($pseudo);
                             }
                         ?></span>
-                        <div class="driver-rating">
-                            <?php 
-                            for ($i = 1; $i <= 5; $i++) {
-                                $starClass = $i <= $covoiturage['note_moyenne'] ? 'star active' : 'star';
-                                echo '<span class="' . $starClass . '">★</span>';
-                            }
-                            ?>
-                            <span class="rating-value">(<?php echo $covoiturage['note_moyenne']; ?>)</span>
-                        </div>
+<div class="driver-rating">
+    <div class="stars-container">
+        <?php 
+        $note = floatval($covoiturage['note_moyenne'] ?? 0);
+        
+        for ($i = 1; $i <= 5; $i++) {
+            if ($i <= $note) {
+                echo '<span class="star active" style="color: #FFD700 !important; font-size: 16px;">★</span>';
+            } else {
+                echo '<span class="star" style="color: #ddd !important; font-size: 16px;">★</span>';
+            }
+        }
+        ?>
+    </div>
+    <span class="rating-value">(<?php echo $covoiturage['note_moyenne'] ?? 0; ?>)</span>
+</div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -267,8 +290,8 @@ unset($_SESSION['search_results'], $_SESSION['search_params'], $_SESSION['search
                 <a href="trajets-chauffeur" class="book-button">Regarder mes trajets</a>
             <?php else: ?>
                 <!-- Trajet d'un autre chauffeur -->
-                <a href="reservation.php?id=<?php echo $covoiturage['covoiturage_id']; ?>" class="book-button">Réserver</a>
-            <?php endif; ?>
+                <a href="../traitement/search-trip.php?action=reserver&id=<?php echo $covoiturage['covoiturage_id']; ?>" class="book-button">Réserver</a>
+                <?php endif; ?>
         </div>
     </div>
 <?php endforeach; ?>

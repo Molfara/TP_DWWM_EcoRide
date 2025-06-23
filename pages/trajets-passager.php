@@ -18,9 +18,9 @@ if (isset($_SESSION['success_message'])) {
     unset($_SESSION['success_message']);
 }
 
-// Vérification si l'utilisateur est connecté et a le rôle de chauffeur
+// Vérification si l'utilisateur est connecté et a le rôle de passager
 // Si non, redirection vers la page de connexion
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'chauffeur') {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'passager') {
     header('Location: /connexion');
     exit;
 }
@@ -38,56 +38,26 @@ try {
     $error = "Erreur de base de données: " . $e->getMessage();
 }
 
-// Auto-annulation des trajets non commencés (30 minutes après l'heure prévue)
-try {
-    $sql = "UPDATE covoiturage 
-            SET statut = 'annulé' 
-            WHERE statut = 'en_attente' 
-            AND CONCAT(date_depart, ' ', heure_depart) < DATE_SUB(NOW(), INTERVAL 30 MINUTE)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    
-    $annulesAutomatiquement = $stmt->rowCount();
-    if ($annulesAutomatiquement > 0) {
-        error_log("Auto-annulé $annulesAutomatiquement trajet(s) en retard");
-    }
-} catch (PDOException $e) {
-    error_log("Erreur auto-annulation: " . $e->getMessage());
-}
-
-// Récupération des trajets à venir (3 premiers) avec les passagers
+// Récupération des trajets à venir (3 premiers) - participations du passager
 $trajets_a_venir = [];
 try {
     $sql = "SELECT c.*, v.modele, v.immatriculation, m.libelle as marque_nom,
-    COUNT(p.participation_id) as nb_participants
-    FROM covoiturage c
-    LEFT JOIN voiture v ON c.voiture_id = v.voiture_id
-    LEFT JOIN marque m ON v.marque_id = m.marque_id
-    LEFT JOIN participation p ON c.covoiturage_id = p.covoiturage_id
-    WHERE c.utilisateur_id = ? 
-    AND c.statut = 'en_attente' 
-    AND CONCAT(c.date_depart, ' ', c.heure_depart) > DATE_SUB(NOW(), INTERVAL 30 MINUTE)
-    GROUP BY c.covoiturage_id
-    ORDER BY c.date_depart ASC, c.heure_depart ASC
-    LIMIT 3";
+            u.pseudo as chauffeur_pseudo, u.utilisateur_id as chauffeur_id, u.photo as chauffeur_photo,
+            p.participation_id
+            FROM participation p
+            JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
+            LEFT JOIN voiture v ON c.voiture_id = v.voiture_id
+            LEFT JOIN marque m ON v.marque_id = m.marque_id
+            JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
+            WHERE p.utilisateur_id = ? 
+            AND c.statut = 'en_attente' 
+            AND CONCAT(c.date_depart, ' ', c.heure_depart) > DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+            ORDER BY c.date_depart ASC, c.heure_depart ASC
+            LIMIT 3";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$userId]);
     $trajets_a_venir = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Pour chaque trajet, récupérer les passagers
-    foreach ($trajets_a_venir as &$trajet) {
-        $stmt_passagers = $pdo->prepare("
-            SELECT u.utilisateur_id, u.pseudo, u.photo  
-            FROM participation p
-            JOIN utilisateur u ON p.utilisateur_id = u.utilisateur_id
-            WHERE p.covoiturage_id = ?
-            ORDER BY p.participation_id ASC
-        ");
-        $stmt_passagers->execute([$trajet['covoiturage_id']]);
-        $trajet['passagers'] = $stmt_passagers->fetchAll(PDO::FETCH_ASSOC);
-    }
-    unset($trajet); // Libérer la référence
     
 } catch (PDOException $e) {
     $error = "Erreur lors de la récupération des trajets à venir: " . $e->getMessage();
@@ -96,11 +66,12 @@ try {
 // Compter le total des trajets à venir pour savoir s'il faut afficher "Afficher plus"
 $total_trajets_a_venir = 0;
 try {
-    $sql = "SELECT COUNT(DISTINCT c.covoiturage_id) as total
-    FROM covoiturage c
-    WHERE c.utilisateur_id = ? 
-    AND c.statut = 'en_attente' 
-    AND CONCAT(c.date_depart, ' ', c.heure_depart) > DATE_SUB(NOW(), INTERVAL 30 MINUTE)";
+    $sql = "SELECT COUNT(p.participation_id) as total
+            FROM participation p
+            JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
+            WHERE p.utilisateur_id = ? 
+            AND c.statut = 'en_attente' 
+            AND CONCAT(c.date_depart, ' ', c.heure_depart) > DATE_SUB(NOW(), INTERVAL 30 MINUTE)";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$userId]);
@@ -113,69 +84,46 @@ try {
 $trajet_en_cours = null;
 try {
     $sql = "SELECT c.*, v.modele, v.immatriculation, m.libelle as marque_nom,
-            COUNT(p.participation_id) as nb_participants
-            FROM covoiturage c
+            u.pseudo as chauffeur_pseudo, u.utilisateur_id as chauffeur_id, u.photo as chauffeur_photo,
+            p.participation_id
+            FROM participation p
+            JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
             LEFT JOIN voiture v ON c.voiture_id = v.voiture_id
             LEFT JOIN marque m ON v.marque_id = m.marque_id
-            LEFT JOIN participation p ON c.covoiturage_id = p.covoiturage_id
-            WHERE c.utilisateur_id = ? 
+            JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
+            WHERE p.utilisateur_id = ? 
             AND c.statut = 'en_route'
-            GROUP BY c.covoiturage_id
             ORDER BY c.date_depart DESC
             LIMIT 1";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$userId]);
     $trajet_en_cours = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    // Récupérer les passagers du trajet en cours
-    if ($trajet_en_cours) {
-        $stmt_passagers = $pdo->prepare("
-            SELECT u.utilisateur_id, u.pseudo, u.photo 
-            FROM participation p
-            JOIN utilisateur u ON p.utilisateur_id = u.utilisateur_id
-            WHERE p.covoiturage_id = ?
-            ORDER BY p.participation_id ASC
-        ");
-        $stmt_passagers->execute([$trajet_en_cours['covoiturage_id']]);
-        $trajet_en_cours['passagers'] = $stmt_passagers->fetchAll(PDO::FETCH_ASSOC);
-    }
 } catch (PDOException $e) {
     $error = "Erreur lors de la récupération du trajet en cours: " . $e->getMessage();
 }
 
-// Récupération de l'historique des trajets (3 derniers)
+// Récupération de l'historique des trajets (3 derniers) - CORRIGÉ
 $historique_trajets = [];
 try {
-    $sql = "SELECT c.*, v.modele, v.immatriculation, m.libelle as marque_nom
-    FROM covoiturage c
-    LEFT JOIN voiture v ON c.voiture_id = v.voiture_id
-    LEFT JOIN marque m ON v.marque_id = m.marque_id
-    WHERE c.utilisateur_id = ? 
-    AND (c.statut IN ('terminé', 'annulé') 
-        OR CONCAT(c.date_depart, ' ', c.heure_depart) <= DATE_SUB(NOW(), INTERVAL 30 MINUTE))
-    ORDER BY c.date_depart DESC, c.heure_depart DESC
-    LIMIT 3";
+    $sql = "SELECT c.*, v.modele, v.immatriculation, m.libelle as marque_nom,
+            u.pseudo as chauffeur_pseudo, u.utilisateur_id as chauffeur_id, u.photo as chauffeur_photo,
+            p.participation_id, a.note, a.commentaire
+            FROM participation p
+            JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
+            LEFT JOIN voiture v ON c.voiture_id = v.voiture_id
+            LEFT JOIN marque m ON v.marque_id = m.marque_id
+            JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
+            LEFT JOIN avis a ON p.participation_id = a.participation_id
+            WHERE p.utilisateur_id = ? 
+            AND (c.statut IN ('terminé', 'annulé') 
+                OR CONCAT(c.date_depart, ' ', c.heure_depart) <= DATE_SUB(NOW(), INTERVAL 30 MINUTE))
+            ORDER BY c.date_depart DESC, c.heure_depart DESC
+            LIMIT 3";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$userId]);
     $historique_trajets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Pour chaque trajet de l'historique, récupérer les avis des passagers
-    foreach ($historique_trajets as &$trajet) {
-        $stmt_avis = $pdo->prepare("
-            SELECT a.note, a.commentaire, u.pseudo, u.photo, p.participation_id
-            FROM avis a
-            JOIN participation p ON a.participation_id = p.participation_id
-            JOIN utilisateur u ON p.utilisateur_id = u.utilisateur_id
-            WHERE p.covoiturage_id = ?
-            ORDER BY a.avis_id ASC
-        ");
-        $stmt_avis->execute([$trajet['covoiturage_id']]);
-        $trajet['avis_passagers'] = $stmt_avis->fetchAll(PDO::FETCH_ASSOC);
-    }
-    unset($trajet); // Libérer la référence
-    
 } catch (PDOException $e) {
     $error = "Erreur lors de la récupération de l'historique: " . $e->getMessage();
 }
@@ -183,11 +131,12 @@ try {
 // Compter le total de l'historique
 $total_historique = 0;
 try {
-    $sql = "SELECT COUNT(*) as total
-    FROM covoiturage c
-    WHERE c.utilisateur_id = ? 
-    AND (c.statut IN ('terminé', 'annulé') 
-        OR CONCAT(c.date_depart, ' ', c.heure_depart) <= DATE_SUB(NOW(), INTERVAL 30 MINUTE))";
+    $sql = "SELECT COUNT(p.participation_id) as total
+            FROM participation p
+            JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
+            WHERE p.utilisateur_id = ? 
+            AND (c.statut IN ('terminé', 'annulé') 
+                OR CONCAT(c.date_depart, ' ', c.heure_depart) <= DATE_SUB(NOW(), INTERVAL 30 MINUTE))";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$userId]);
@@ -218,87 +167,42 @@ function getStatutLabel($statut) {
     }
 }
 
-// Fonction pour afficher les étoiles
+// Fonction pour afficher les étoiles de notation
 function displayStars($note = null) {
     $html = '<div class="rating-stars">';
     for ($i = 1; $i <= 5; $i++) {
         $class = ($note && $i <= $note) ? 'star filled' : 'star';
-        $html .= '<span class="' . $class . '">★</span>';
+        $html .= '<span class="' . $class . '" data-rating="' . $i . '">★</span>';
     }
     $html .= '</div>';
     return $html;
 }
 
-// Fonction pour afficher les passagers
-function displayPassagers($passagers) {
-    if (empty($passagers)) {
-        return null; 
+// Fonction pour afficher l'avatar et le pseudo du chauffeur
+function displayChauffeurAvatar($chauffeur) {
+    if (empty($chauffeur) || empty($chauffeur['chauffeur_pseudo'])) {
+        return '';
     }
     
-    $html = '<div class="passengers-list">';
-    foreach ($passagers as $passager) {
-        $pseudo = htmlspecialchars($passager['pseudo']);
-        
-        $html .= '<div class="passenger-item">';
-        
-        // Créer une URL de données à partir d'un BLOB ou utiliser un placeholder
-        if (!empty($passager['photo'])) {
-            $avatar = 'data:image/jpeg;base64,' . base64_encode($passager['photo']);
-            $html .= '<img src="' . $avatar . '" alt="Avatar de ' . $pseudo . '" class="passenger-avatar">';
-        } else {
-            $html .= '<div class="passenger-avatar-placeholder">' . strtoupper(substr($pseudo, 0, 1)) . '</div>';
-        }
-        
-        $html .= '<span class="passenger-pseudo">' . $pseudo . '</span>';
-        $html .= '</div>';
+    $pseudo = htmlspecialchars($chauffeur['chauffeur_pseudo']);
+    
+    $html = '<div class="chauffeur-info">';
+    $html .= '<div class="chauffeur-avatar-container">';
+    
+    // Créer une URL de données à partir d'un BLOB ou utiliser un placeholder
+    if (!empty($chauffeur['chauffeur_photo'])) {
+        $avatar = 'data:image/jpeg;base64,' . base64_encode($chauffeur['chauffeur_photo']);
+        $html .= '<img src="' . $avatar . '" alt="Avatar de ' . $pseudo . '" class="chauffeur-avatar">';
+    } else {
+        $html .= '<div class="chauffeur-avatar-placeholder">' . strtoupper(substr($pseudo, 0, 1)) . '</div>';
     }
+    
+    $html .= '<span class="chauffeur-pseudo">' . $pseudo . '</span>';
+    $html .= '</div>';
     $html .= '</div>';
     
     return $html;
 }
-
-// Fonction pour afficher les avis des passagers
-function displayAvisPassagers($avis_passagers) {
-    if (empty($avis_passagers)) {
-        return '<div class="no-reviews"><p style="color: #6c757d; font-style: italic;">Aucun avis reçu pour ce trajet.</p></div>';
-    }
-    
-    $html = '<div class="reviews-container">';
-    foreach ($avis_passagers as $avis) {
-        $pseudo = htmlspecialchars($avis['pseudo']);
-        
-        $html .= '<div class="review-item">';
-        
-        // Avatar + pseudo du passager
-        $html .= '<div class="reviewer-info">';
-        if (!empty($avis['photo'])) {
-            $avatar = 'data:image/jpeg;base64,' . base64_encode($avis['photo']);
-            $html .= '<img src="' . $avatar . '" alt="Avatar de ' . $pseudo . '" class="reviewer-avatar">';
-        } else {
-            $html .= '<div class="reviewer-avatar-placeholder">' . strtoupper(substr($pseudo, 0, 1)) . '</div>';
-        }
-        $html .= '<span class="reviewer-pseudo">' . $pseudo . '</span>';
-        $html .= '</div>';
-        
-        // Note (étoiles)
-        $html .= '<div class="review-rating">';
-        $html .= displayStars($avis['note']);
-        $html .= '</div>';
-        
-        // Commentaire
-        if (!empty($avis['commentaire'])) {
-            $html .= '<div class="review-comment">';
-            $html .= '<p>' . htmlspecialchars($avis['commentaire']) . '</p>';
-            $html .= '</div>';
-        }
-        
-        $html .= '</div>'; // fin review-item
-    }
-    $html .= '</div>'; // fin reviews-container
-    
-    return $html;
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -306,21 +210,21 @@ function displayAvisPassagers($avis_passagers) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espace Chauffeur - CoVoiturage</title>
+    <title>Espace Passager - CoVoiturage</title>
     <!-- Inclusion de la feuille de style principale -->
     <link rel="stylesheet" href="../public/style.css">
 </head>
-<body class="page-trajets-chauffeur"> 
+<body class="page-trajets-passager"> 
     <?php
     // Inclusion de l'en-tête commun du site
     include_once '../public/header.php';
     ?>
 
 <main class="container">
-    <div class="hero-background driver-hero">
-        <div class="chauffeur-content">
-            <h1>Espace Chauffeur</h1>
-            <a href="role" class="btn btn-white">Changer pour passager</a>
+    <div class="hero-background passenger-hero">
+        <div class="hero-content passenger-content">
+            <h1>Espace Passager</h1>
+            <a href="role" class="btn btn-white">Changer pour chauffeur</a>
         </div>
     </div>
     
@@ -331,10 +235,10 @@ function displayAvisPassagers($avis_passagers) {
     <!-- Titre principal de la page -->
     <h2 class="page-title">Mes trajets</h2>
 
-    <!-- Bouton pour proposer un nouveau trajet -->
+    <!-- Bouton pour trouver un nouveau covoiturage -->
     <div class="nouveau-trajet-container">
-        <button class="btn btn-success" onclick="window.location.href='/proposer-trajet'">
-            Proposer un nouveau trajet
+        <button class="btn btn-success" onclick="window.location.href='/covoiturage'">
+            Trouver un nouveau covoiturage
         </button>
     </div>
 
@@ -347,7 +251,7 @@ function displayAvisPassagers($avis_passagers) {
             <div class="vehicle-card">
             <div class="trip-header-current">
                  <h3 class="trip-title-current">
-                  Je suis en route
+                  Trajet en cours
                  </h3>
             </div>
                 
@@ -365,39 +269,19 @@ function displayAvisPassagers($avis_passagers) {
                 </div>
 
                 <div class="trip-info">
-                    <strong>Prix :</strong> <?= number_format($trajet_en_cours['prix_personne'], 2) ?> crédits
+                    <strong>Prix payé :</strong> <?= number_format($trajet_en_cours['prix_personne'], 2) ?> crédits
                 </div>
-                
-                <div class="trip-info">
-                    <strong>Places occupées :</strong> 
-                    <?php 
-                        $places_occupees = isset($trajet_en_cours['nb_participants']) ? $trajet_en_cours['nb_participants'] : 0;
-                        $total_places = $trajet_en_cours['nb_place'];
-                        echo $places_occupees . '/' . $total_places;
-                    ?>
-                </div>
-                
+
                 <div class="trip-info">
                     <strong>Voiture :</strong> 
                     <?= htmlspecialchars($trajet_en_cours['marque_nom'] . ' ' . $trajet_en_cours['modele'] . ' (' . $trajet_en_cours['immatriculation'] . ')') ?>
                 </div>
-
-                <?php $passagersHtml = displayPassagers($trajet_en_cours['passagers']); ?>
-                <?php if ($passagersHtml): ?>
-                <div class="trip-info">
-                <strong>Passagers :</strong>
-                <?= $passagersHtml ?>
-                </div>
-                <?php endif; ?>
                 
-                <div class="trip-actions">
-                    <button class="btn btn-success" onclick="finishTrip(<?= $trajet_en_cours['covoiturage_id'] ?>)">
-                    Terminer le trajet
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="cancelTrip(<?= $trajet_en_cours['covoiturage_id'] ?>)">
-                        Annuler
-                    </button>
+                <div class="trip-info">
+                    <strong>Chauffeur :</strong>
+                    <?= displayChauffeurAvatar($trajet_en_cours) ?>
                 </div>
+                
             </div>
         </section>
     </div>
@@ -443,42 +327,25 @@ function displayAvisPassagers($avis_passagers) {
                                 </div>
 
                                 <div class="trip-info">
-                                    <strong>Prix :</strong> <?= number_format($trajet['prix_personne'], 2) ?> crédits
+                                    <strong>Prix payé :</strong> <?= number_format($trajet['prix_personne'], 2) ?> crédits
                                 </div>
-                                
-                                <div class="trip-info">
-                                    <strong>Places occupées :</strong> 
-                                    <?php 
-                                        // Nombre de participants inscrits
-                                        $places_occupees = isset($trajet['nb_participants']) ? $trajet['nb_participants'] : 0;
-                                        // Nombre total de places proposées pour ce trajet
-                                        $total_places = $trajet['nb_place'];
-                                        echo $places_occupees . '/' . $total_places;
-                                    ?>
-                                </div>
-                                
+
                                 <div class="trip-info">
                                     <strong>Voiture :</strong> 
                                     <?= htmlspecialchars($trajet['marque_nom'] . ' ' . $trajet['modele'] . ' (' . $trajet['immatriculation'] . ')') ?>
                                 </div>
-
-                                <?php $passagersHtml = displayPassagers($trajet['passagers']); ?>
-                                <?php if ($passagersHtml): ?>
+                                
                                 <div class="trip-info">
-                                <strong>Passagers :</strong>
-                                <?= $passagersHtml ?>
+                                    <strong>Chauffeur :</strong> 
+                                    <?= displayChauffeurAvatar($trajet) ?>
                                 </div>
-                                <?php endif; ?>
+                                
+                               
                                 
                                 <div class="trip-actions">
-                                    <button class="btn btn-primary" onclick="startTrip(<?= $trajet['covoiturage_id'] ?>)">
-                                     Commencer le trajet
+                                    <button class="btn btn-danger btn-sm" onclick="cancelParticipation(<?= $trajet['participation_id'] ?>)">
+                                        Annuler
                                     </button>
-                                    <?php if ($trajet['statut'] === 'en_attente'): ?>
-                                       <button class="btn btn-danger btn-sm" onclick="cancelTrip(<?= $trajet['covoiturage_id'] ?>)">
-                                         Annuler
-                                       </button>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -528,16 +395,7 @@ function displayAvisPassagers($avis_passagers) {
                                 </div>
 
                                 <div class="trip-info">
-                                     <strong>Prix :</strong> <?= number_format($trajet['prix_personne'], 2) ?> crédits
-                                </div>
-
-                                <div class="trip-info">
-                                    <strong>Places occupées :</strong> 
-                                    <?php 
-                                        $places_occupees = isset($trajet['nb_participants']) ? $trajet['nb_participants'] : 0;
-                                        $total_places = $trajet['nb_place'];
-                                        echo $places_occupees . '/' . $total_places;
-                                    ?>
+                                     <strong>Prix payé :</strong> <?= number_format($trajet['prix_personne'], 2) ?> crédits
                                 </div>
 
                                 <div class="trip-info">
@@ -545,23 +403,46 @@ function displayAvisPassagers($avis_passagers) {
                                       <?= htmlspecialchars($trajet['marque_nom'] . ' ' . $trajet['modele'] . ' (' . $trajet['immatriculation'] . ')') ?>
                                 </div>
 
-                                <!-- Section des avis des passagers -->
-                                <?php if ($trajet['statut'] === 'terminé' && !empty($trajet['avis_passagers'])): ?>
-                                    <div class="trip-reviews-section">
-                                        <div class="trip-info">
-                                            <strong>Avis des passagers :</strong>
-                                            <?= displayAvisPassagers($trajet['avis_passagers']) ?>
+                                <div class="trip-info">
+                                    <strong>Chauffeur :</strong> 
+                                    <?= displayChauffeurAvatar($trajet) ?>
+                                </div>
+
+                                <?php if ($trajet['statut'] === 'terminé'): ?>
+                                    <?php if ($trajet['note'] && $trajet['commentaire']): ?>
+                                        <div class="trip-info rating-display">
+                                            <strong>Votre évaluation :</strong>
+                                            <?= displayStars($trajet['note']) ?>
+                                            <p class="comment-display"><?= htmlspecialchars($trajet['commentaire']) ?></p>
                                         </div>
-                                    </div>
-                                <?php elseif ($trajet['statut'] === 'terminé'): ?>
-                                    <div class="trip-reviews-section">
-                                        <div class="trip-info">
-                                            <strong>Avis des passagers :</strong>
-                                            <div class="no-reviews">
-                                                <p style="color: #6c757d; font-style: italic;">Aucun avis reçu pour ce trajet.</p>
+                                    <?php else: ?>
+                                        <div class="rating-section" id="rating-<?= $trajet['participation_id'] ?>">
+                                            <div class="trip-info">
+                                                <strong>Laisser un avis :</strong>
+                                                <textarea 
+                                                    class="rating-comment" 
+                                                    id="comment-<?= $trajet['participation_id'] ?>" 
+                                                    placeholder="Votre commentaire (max 300 caractères)" 
+                                                    maxlength="300"></textarea>
+                                                <div class="char-count">0/300</div>
+                                            </div>
+                                            <div class="trip-info">
+                                                <strong>Note :</strong>
+                                                <div class="rating-stars clickable" data-participation="<?= $trajet['participation_id'] ?>">
+                                                    <span class="star" data-rating="1">★</span>
+                                                    <span class="star" data-rating="2">★</span>
+                                                    <span class="star" data-rating="3">★</span>
+                                                    <span class="star" data-rating="4">★</span>
+                                                    <span class="star" data-rating="5">★</span>
+                                                </div>
+                                            </div>
+                                            <div class="trip-actions">
+                                                <button class="btn btn-primary btn-sm" onclick="submitRating(<?= $trajet['participation_id'] ?>)">
+                                                    Évaluer le trajet
+                                                </button>
                                             </div>
                                         </div>
-                                    </div>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
@@ -585,53 +466,30 @@ function displayAvisPassagers($avis_passagers) {
 // Variables pour la pagination
 let offsetAVenir = 3;
 let offsetHistorique = 3;
+let selectedRatings = {}; // Pour stocker les notes sélectionnées
 
-function cancelTrip(tripId) {
-    if (confirm('Êtes-vous sûr de vouloir annuler ce trajet ? Les participants seront remboursés.')) {
-        processTrip('cancel', tripId);
+function cancelParticipation(participationId) {
+    if (confirm('Êtes-vous sûr de vouloir annuler votre participation à ce trajet ? Vous serez remboursé.')) {
+        processPassengerTrip('cancel', participationId);
     }
 }
 
-function startTrip(tripId) {
-    if (confirm('Voulez-vous commencer ce trajet ?')) {
-        processTrip('start', tripId);
-    }
-}
-
-function finishTrip(tripId) {
-    if (confirm('Voulez-vous terminer ce trajet ?')) {
-        processTrip('finish', tripId);
-    }
-}
-
-function processTrip(action, tripId) {
-    // Appel AJAX unifié pour toutes les opérations sur les trajets
-    fetch('../traitement/process-trip.php', {
+function processPassengerTrip(action, participationId) {
+    // Appel AJAX unifié pour toutes les opérations sur les trajets passager
+    fetch('../traitement/process-trip-passager.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
             action: action,
-            trip_id: tripId 
+            participation_id: participationId 
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            let message = data.message;
-            
-            // Messages spécifiques selon l'action
-            if (action === 'finish' && data.gains) {
-                message += `\nVous avez gagné ${data.gains} crédits !`;
-                if (data.participants) {
-                    message += `\n${data.participants} participant(s) - Commission plateforme: ${data.commission} crédits`;
-                }
-            } else if (action === 'cancel' && data.participants_rembourses) {
-                message += `\n${data.participants_rembourses} participant(s) remboursé(s)`;
-            }
-            
-            alert(message);
+            alert(data.message);
             location.reload();
         } else {
             alert('Erreur: ' + data.message);
@@ -648,7 +506,7 @@ function loadMoreTrajets(type, limit) {
     const offset = (type === 'a_venir') ? offsetAVenir : offsetHistorique;
     
     // Appel AJAX pour charger plus de trajets
-    fetch('../traitement/process-trip.php', {
+    fetch('../traitement/process-trip-passager.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -670,6 +528,9 @@ function loadMoreTrajets(type, limit) {
             
             // Ajouter le nouveau contenu HTML
             container.insertAdjacentHTML('beforeend', data.html);
+            
+            // Réactiver les événements pour les nouveaux éléments
+            initializeRatingEvents();
             
             // Mettre à jour l'offset pour la prochaine requête
             if (type === 'a_venir') {
@@ -699,6 +560,114 @@ function loadMoreTrajets(type, limit) {
     });
 }
 
+function submitRating(participationId) {
+    const rating = selectedRatings[participationId] || 0;
+    const comment = document.getElementById(`comment-${participationId}`).value.trim();
+    
+    if (rating === 0) {
+        alert('Veuillez sélectionner une note');
+        return;
+    }
+    
+    // Appel AJAX pour soumettre la note et le commentaire
+    fetch('../traitement/process-trip-passager.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            action: 'rate',
+            participation_id: participationId,
+            rating: rating,
+            comment: comment
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Évaluation enregistrée avec succès !');
+            location.reload();
+        } else {
+            alert('Erreur: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de l\'enregistrement de l\'évaluation');
+    });
+}
+
+// Fonction pour initialiser les événements de notation
+function initializeRatingEvents() {
+    // Gestion des étoiles de notation
+    document.querySelectorAll('.rating-stars.clickable').forEach(function(starsContainer) {
+        // Éviter de dupliquer les événements
+        if (starsContainer.dataset.initialized) return;
+        starsContainer.dataset.initialized = 'true';
+        
+        const participationId = starsContainer.dataset.participation;
+        const stars = starsContainer.querySelectorAll('.star');
+        
+        stars.forEach(function(star, index) {
+            star.addEventListener('click', function() {
+                const rating = parseInt(star.dataset.rating);
+                selectedRatings[participationId] = rating;
+                
+                // Mettre à jour l'affichage des étoiles
+                stars.forEach(function(s, i) {
+                    if (i < rating) {
+                        s.classList.add('filled');
+                    } else {
+                        s.classList.remove('filled');
+                    }
+                });
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(star.dataset.rating);
+                stars.forEach(function(s, i) {
+                    if (i < rating) {
+                        s.classList.add('hover');
+                    } else {
+                        s.classList.remove('hover');
+                    }
+                });
+            });
+        });
+        
+        starsContainer.addEventListener('mouseleave', function() {
+            stars.forEach(function(s) {
+                s.classList.remove('hover');
+            });
+        });
+    });
+    
+    // Compteur de caractères pour les commentaires
+    document.querySelectorAll('.rating-comment').forEach(function(textarea) {
+        // Éviter de dupliquer les événements
+        if (textarea.dataset.initialized) return;
+        textarea.dataset.initialized = 'true';
+        
+        const charCount = textarea.nextElementSibling;
+        
+        textarea.addEventListener('input', function() {
+            const count = textarea.value.length;
+            charCount.textContent = `${count}/300`;
+            
+            if (count > 280) {
+                charCount.style.color = '#e74c3c';
+            } else {
+                charCount.style.color = '#666';
+            }
+        });
+    });
+}
+
+// Gestion des étoiles cliquables
+document.addEventListener('DOMContentLoaded', function() {
+    initializeRatingEvents();
+});
+
 // Auto-masquer les messages de succès après 5 secondes
 setTimeout(function() {
     const successAlert = document.querySelector('.message.success');
@@ -708,5 +677,6 @@ setTimeout(function() {
     }
 }, 5000);
 </script>
+
 </body>
 </html>

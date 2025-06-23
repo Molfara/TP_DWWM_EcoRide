@@ -47,9 +47,27 @@ if ($request === 'traitement/search-trip.php' && ($method === 'GET' || $method =
     exit; // Très important - arrête l'exécution ici
 }
 
+// Vérification pour réservation
+if (strpos($request, 'traitement/search-trip.php') === 0 && $method === 'GET' && isset($_GET['action']) && $_GET['action'] === 'reserver') {
+    require __DIR__ . '/../traitement/search-trip.php';
+    exit;
+}
+
 // Vérification pour profil-passager.php
 if ($request === 'traitement/profil-utilisateur.php' && $method === 'POST') {
     require __DIR__ . '/../traitement/profil-utilisateur.php';
+    exit; // Très important - arrête l'exécution ici
+}
+
+// Vérification pour process-payments.php
+if ($request === 'traitement/process-payments.php' && $method === 'GET') {
+    require __DIR__ . '/../traitement/process-payments.php';
+    exit; // Très important - arrête l'exécution ici
+}
+
+// Vérification pour process-trip-passager.php
+if ($request === 'traitement/process-trip-passager.php' && $method === 'POST') {
+    require __DIR__ . '/../traitement/process-trip-passager.php';
     exit; // Très important - arrête l'exécution ici
 }
 
@@ -137,6 +155,12 @@ $routes = [
 'trajets-chauffeur' => [
     'middleware' => 'checkAuth',
     'handler' => 'pages/trajets-chauffeur.php'
+],
+
+// Route pour les trajets de passager
+'trajets-passager' => [
+    'middleware' => 'checkAuth',
+    'handler' => 'pages/trajets-passager.php'
 ],
 
 ];

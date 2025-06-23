@@ -6,7 +6,7 @@ require_once __DIR__ . '/../middleware/auth.php';
 // Vérification si l'utilisateur est connecté et a le rôle de passager
 // Si non, redirection vers la page de connexion
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'passager') {
-    header('Location: connexion.php');
+    header('Location: connexion');
     exit;
 }
 

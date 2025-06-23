@@ -92,7 +92,7 @@ function handleLoadMore($pdo, $userId, $type, $offset, $limit) {
             // Pour chaque trajet, récupérer les passagers
             foreach ($trajets as &$trajet) {
                 $stmt_passagers = $pdo->prepare("
-                    SELECT u.utilisateur_id, u.pseudo 
+                    SELECT u.utilisateur_id, u.pseudo, u.photo  
                     FROM participation p
                     JOIN utilisateur u ON p.utilisateur_id = u.utilisateur_id
                     WHERE p.covoiturage_id = ?
@@ -190,6 +190,8 @@ function generateTrajetAVenirHTML($trajet) {
     $places_occupees = isset($trajet['nb_participants']) ? $trajet['nb_participants'] : 0;
     $total_places = $trajet['nb_place'];
     
+    $passagersHtml = displayPassagers($trajet['passagers']);
+    
     return '
     <div class="vehicle-card">
         <div class="trip-header-upcoming">
@@ -219,10 +221,11 @@ function generateTrajetAVenirHTML($trajet) {
             <strong>Places occupées :</strong> ' . $places_occupees . '/' . $total_places . '
         </div>
         
+        ' . ($passagersHtml ? '
         <div class="trip-info">
             <strong>Passagers :</strong>
-            ' . displayPassagers($trajet['passagers']) . '
-        </div>
+            ' . $passagersHtml . '
+        </div>' : '') . '
         
         <div class="trip-info">
             <strong>Voiture :</strong> 
@@ -245,6 +248,46 @@ function generateTrajetAVenirHTML($trajet) {
  * Générer HTML pour l'historique
  */
 function generateHistoriqueHTML($trajet) {
+    // Récupérer les avis pour ce trajet (dans la fonction handleLoadMore)
+    global $pdo;
+    $avis_passagers = [];
+    if ($trajet['statut'] === 'terminé') {
+        $stmt_avis = $pdo->prepare("
+            SELECT a.note, a.commentaire, u.pseudo, u.photo, p.participation_id
+            FROM avis a
+            JOIN participation p ON a.participation_id = p.participation_id
+            JOIN utilisateur u ON p.utilisateur_id = u.utilisateur_id
+            WHERE p.covoiturage_id = ?
+            ORDER BY a.avis_id ASC
+        ");
+        $stmt_avis->execute([$trajet['covoiturage_id']]);
+        $avis_passagers = $stmt_avis->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    // Section avis
+    $avisSection = '';
+    if ($trajet['statut'] === 'terminé') {
+        if (!empty($avis_passagers)) {
+            $avisSection = '
+            <div class="trip-reviews-section">
+                <div class="trip-info">
+                    <strong>Avis des passagers :</strong>
+                    ' . displayAvisPassagersInProcess($avis_passagers) . '
+                </div>
+            </div>';
+        } else {
+            $avisSection = '
+            <div class="trip-reviews-section">
+                <div class="trip-info">
+                    <strong>Avis des passagers :</strong>
+                    <div class="no-reviews">
+                        <p style="color: #6c757d; font-style: italic;">Aucun avis reçu pour ce trajet.</p>
+                    </div>
+                </div>
+            </div>';
+        }
+    }
+    
     return '
     <div class="trip-card history">
         <div class="trip-header-history">
@@ -279,6 +322,7 @@ function generateHistoriqueHTML($trajet) {
             ' . htmlspecialchars($trajet['marque_nom'] . ' ' . $trajet['modele'] . ' (' . $trajet['immatriculation'] . ')') . '
         </div>
         
+        ' . $avisSection . '
     </div>';
 }
 
@@ -305,17 +349,23 @@ function getStatutLabel($statut) {
 // Fonction pour afficher les passagers (identique à celle de trajets-chauffeur.php)
 function displayPassagers($passagers) {
     if (empty($passagers)) {
-        return '<span class="no-passengers">Aucun passager inscrit</span>';
+        return null;
     }
     
     $html = '<div class="passengers-list">';
     foreach ($passagers as $passager) {
-        // Utiliser photo.php pour récupérer l'avatar depuis la base de données
-        $avatar = '../photo.php?id=' . $passager['utilisateur_id'];
         $pseudo = htmlspecialchars($passager['pseudo']);
         
         $html .= '<div class="passenger-item">';
-        $html .= '<img src="' . $avatar . '" alt="Avatar de ' . $pseudo . '" class="passenger-avatar" onerror="this.src=\'../public/images/default-avatar.png\'">';
+        
+        // Créer une URL de données à partir d’un BLOB ou utiliser un placeholder
+        if (!empty($passager['photo'])) {
+            $avatar = 'data:image/jpeg;base64,' . base64_encode($passager['photo']);
+            $html .= '<img src="' . $avatar . '" alt="Avatar de ' . $pseudo . '" class="passenger-avatar">';
+        } else {
+            $html .= '<div class="passenger-avatar-placeholder">' . strtoupper(substr($pseudo, 0, 1)) . '</div>';
+        }
+        
         $html .= '<span class="passenger-pseudo">' . $pseudo . '</span>';
         $html .= '</div>';
     }
@@ -356,7 +406,7 @@ function handleStartTrip($pdo, $tripId, $userId) {
 }
 
 /**
- * Terminer un trajet avec calcul des gains
+ * Terminer un trajet avec la nouvelle logique de paiement
  */
 function handleFinishTrip($pdo, $tripId, $userId) {
     $pdo->beginTransaction();
@@ -377,7 +427,7 @@ function handleFinishTrip($pdo, $tripId, $userId) {
         $participants = $stmt->fetch();
         $nbParticipants = $participants['nb_participants'];
         
-        // Calculer les gains
+        // Calculer les gains POTENTIELS (sans les transférer pour le moment)
         $prixTotal = $nbParticipants * $trajet['prix_personne'];
         $commissionPlateforme = $nbParticipants * 2; // 2 crédits par participant pour la plateforme
         $gainsChauffeur = $prixTotal - $commissionPlateforme;
@@ -386,31 +436,56 @@ function handleFinishTrip($pdo, $tripId, $userId) {
         $gainsChauffeur = max(0, $gainsChauffeur);
         $commissionPlateforme = min($prixTotal, $commissionPlateforme);
         
-        // Mettre à jour le trajet
+        // Calculer la note moyenne des avis existants
+        $stmt = $pdo->prepare("
+            SELECT AVG(a.note) as note_moyenne 
+            FROM avis a 
+            JOIN participation p ON a.participation_id = p.participation_id 
+            WHERE p.covoiturage_id = ?
+        ");
+        $stmt->execute([$tripId]);
+        $resultNote = $stmt->fetch();
+        $noteMoyenne = $resultNote['note_moyenne'] ? round($resultNote['note_moyenne'], 1) : null;
+        
+        // Déterminer le statut de paiement selon la logique:
+        // - Pas d'avis OU note >= 3 : paiement dans 15 minutes
+        // - Note < 3 : attente de révision manuelle
+        if ($noteMoyenne === null || $noteMoyenne >= 3) {
+            $paiementStatut = 'en_attente_timer';
+            $message = 'Trajet terminé avec succès. ';
+            if ($noteMoyenne === null) {
+                $message .= 'Paiement prévu dans 15 minutes (aucun avis reçu).';
+            } else {
+                $message .= "Paiement prévu dans 15 minutes (note moyenne: {$noteMoyenne}/5).";
+            }
+        } else {
+            $paiementStatut = 'en_attente_review';
+            $message = "Trajet terminé. Paiement en attente de vérification (note moyenne: {$noteMoyenne}/5).";
+        }
+        
+        // Mettre à jour le trajet avec les gains calculés et le statut de paiement
         $stmt = $pdo->prepare("
             UPDATE covoiturage 
             SET statut = 'terminé', 
                 gains_chauffeur = ?, 
-                commission_plateforme = ?
+                commission_plateforme = ?,
+                paiement_statut = ?
             WHERE covoiturage_id = ?
         ");
-        $stmt->execute([$gainsChauffeur, $commissionPlateforme, $tripId]);
+        $stmt->execute([$gainsChauffeur, $commissionPlateforme, $paiementStatut, $tripId]);
         
-        // Mettre à jour le solde du chauffeur
-        if ($gainsChauffeur > 0) {
-            $gainsEntiers = floor($gainsChauffeur);
-            $stmt = $pdo->prepare("UPDATE utilisateur SET credits = credits + ? WHERE utilisateur_id = ?");
-            $stmt->execute([$gainsEntiers, $userId]);
-        }
+        // NE PAS transférer les crédits maintenant - cela se fera plus tard selon la logique
         
         $pdo->commit();
         
         echo json_encode([
             'success' => true, 
-            'message' => 'Trajet terminé avec succès',
-            'gains' => $gainsChauffeur,
+            'message' => $message,
+            'gains_potentiels' => $gainsChauffeur,
             'participants' => $nbParticipants,
-            'commission' => $commissionPlateforme
+            'commission' => $commissionPlateforme,
+            'note_moyenne' => $noteMoyenne,
+            'paiement_statut' => $paiementStatut
         ]);
         
     } catch (Exception $e) {
@@ -459,8 +534,8 @@ function handleCancelTrip($pdo, $tripId, $userId) {
         $stmt = $pdo->prepare("DELETE FROM participation WHERE covoiturage_id = ?");
         $stmt->execute([$tripId]);
         
-        // Mettre à jour le statut du trajet
-        $stmt = $pdo->prepare("UPDATE covoiturage SET statut = 'annulé' WHERE covoiturage_id = ?");
+        // Mettre à jour le statut du trajet et de paiement
+        $stmt = $pdo->prepare("UPDATE covoiturage SET statut = 'annulé', paiement_statut = 'annulé' WHERE covoiturage_id = ?");
         $stmt->execute([$tripId]);
         
         $pdo->commit();
@@ -480,3 +555,58 @@ function handleCancelTrip($pdo, $tripId, $userId) {
         throw $e;
     }
 }
+
+// FONCTION POUR LES AVIS DANS LE FICHIER DE TRAITEMENT
+
+function displayAvisPassagersInProcess($avis_passagers) {
+    if (empty($avis_passagers)) {
+        return '<div class="no-reviews"><p style="color: #6c757d; font-style: italic;">Aucun avis reçu pour ce trajet.</p></div>';
+    }
+    
+    $html = '<div class="reviews-container">';
+    foreach ($avis_passagers as $avis) {
+        $pseudo = htmlspecialchars($avis['pseudo']);
+        
+        $html .= '<div class="review-item">';
+        
+        // Avatar + pseudo du passager
+        $html .= '<div class="reviewer-info">';
+        if (!empty($avis['photo'])) {
+            $avatar = 'data:image/jpeg;base64,' . base64_encode($avis['photo']);
+            $html .= '<img src="' . $avatar . '" alt="Avatar de ' . $pseudo . '" class="reviewer-avatar">';
+        } else {
+            $html .= '<div class="reviewer-avatar-placeholder">' . strtoupper(substr($pseudo, 0, 1)) . '</div>';
+        }
+        $html .= '<span class="reviewer-pseudo">' . $pseudo . '</span>';
+        $html .= '</div>';
+        
+        // Note (étoiles)
+        $html .= '<div class="review-rating">';
+        $html .= displayStarsInProcess($avis['note']);
+        $html .= '</div>';
+        
+        // Commentaire
+        if (!empty($avis['commentaire'])) {
+            $html .= '<div class="review-comment">';
+            $html .= '<p>' . htmlspecialchars($avis['commentaire']) . '</p>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>'; // fin review-item
+    }
+    $html .= '</div>'; // fin reviews-container
+    
+    return $html;
+}
+
+// FONCTION POUR AFFICHER LES ÉTOILES DANS LE FICHIER DE TRAITEMENT
+function displayStarsInProcess($note = null) {
+    $html = '<div class="rating-stars">';
+    for ($i = 1; $i <= 5; $i++) {
+        $class = ($note && $i <= $note) ? 'star filled' : 'star';
+        $html .= '<span class="' . $class . '">★</span>';
+    }
+    $html .= '</div>';
+    return $html;
+}
+?>

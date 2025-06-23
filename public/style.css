@@ -1825,6 +1825,54 @@ footer {
     background-color: #F44336;
 }
 
+/* Styles pour les avatars des passagers */
+.passenger-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.passengers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.passenger-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 10px;
+}
+
+.passenger-pseudo {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Placeholder pour les passagers sans avatar */
+.passenger-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Styles pour le cas où il n'y a pas de passagers */
+.no-passengers {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 16px;
+}
+
 /* Conteneur pour le bouton nouveau trajet */
 .nouveau-trajet-container {
     display: flex; 
@@ -1905,6 +1953,68 @@ footer {
 .trip-actions .btn-success:hover {
     background-color: #007ACC !important;
 }
+
+/* Styles pour les avatars des passagers dans les avis - Page chauffeur */
+.reviewer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.reviewer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.reviewer-avatar-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 10px;
+}
+
+.reviewer-pseudo {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Placeholder pour les passagers sans avatar */
+.reviewer-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
+
+/* Override pour l'affichage des avis - structure horizontale */
+.review-item .reviewer-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.review-item .reviewer-avatar,
+.review-item .reviewer-avatar-placeholder {
+    margin-bottom: 0;
+}
+
+
 
 /* Conteneur pour le bouton afficher plus */
 .load-more-container {
@@ -2296,7 +2406,7 @@ textarea.form-control {
 
 .ride-header {
     display: flex;
-    gap: 25px;
+    gap: 20px;
     margin-bottom: 10px;
     align-items: baseline;
     min-height: 40px;
@@ -2427,6 +2537,7 @@ textarea.form-control {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    margin-top: 6px;
 }
 
 .driver-name {
@@ -2434,9 +2545,28 @@ textarea.form-control {
     color: #333;
 }
 
+.driver-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+}
 
-.driver-rating .star {
-    font-size: 16px;
+.driver-rating .stars-container {
+    margin-bottom: 0;
+    display: flex;
+    gap: 2px;
+}
+
+.driver-rating .rating-value {
+    color: #333;
+    font-size: 14px;
+    margin-left: 0; /* Убираем дополнительный отступ */
+}
+
+
+
+.alert.alert-danger {
+    text-align: center;
 }
 
 .ride-price {
@@ -2488,6 +2618,8 @@ textarea.form-control {
     background-color: #dc3545;
 }
 
+
+
 /* Adaptation mobile pour les filtres */
 @media (max-width: 768px) {
     .filters-panel {
@@ -2516,4 +2648,84 @@ textarea.form-control {
         align-items: stretch;
         text-align: center;
     }
+}
+
+/* =========================
+   STYLES POUR LA SECTION TRAJETS du PASSAGER
+   ========================= */
+
+   /* Styles pour les étoiles de notation dans les trajets */
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.rating-stars .star {
+    font-size: 20px;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    user-select: none;
+}
+
+/* Étoiles remplies (note existante ou sélectionnée) */
+.rating-stars .star.filled {
+    color: #FFD700;
+}
+
+/* Étoiles en survol */
+.rating-stars .star.hover {
+    color: #FFD700;
+}
+
+/* Étoiles pour affichage seulement (pas cliquables) */
+.rating-stars:not(.clickable) .star {
+    cursor: default;
+}
+
+/* Étoiles cliquables */
+.rating-stars.clickable .star:hover {
+    color: #FFD700;
+}
+
+/* Styles pour les avatars des chauffeurs */
+.chauffeur-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 5px;
+}
+
+.chauffeur-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.chauffeur-avatar-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 10px;
+}
+
+.chauffeur-pseudo {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Placeholder pour les chauffeurs sans avatar */
+.chauffeur-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
 }

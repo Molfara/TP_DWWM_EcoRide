@@ -3,6 +3,126 @@
 session_start();
 require_once '../config/database.php';
 
+// Вérifier si c'est une réservation
+if (isset($_GET['action']) && $_GET['action'] === 'reserver' && isset($_GET['id'])) {
+    handleReservation($pdo, $_GET['id']);
+    exit;
+}
+
+/**
+ * Fonction de gestion de la réservation
+ */
+function handleReservation($pdo, $covoiturageId) {
+    // Vérification de l'authentification et du rôle
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'passager') {
+        $_SESSION['error_message'] = 'Vous devez être connecté en tant que passager pour réserver';
+        header('Location: ../connexion');
+        exit;
+    }
+
+    // Vérification que l'ID du covoiturage est valide
+    if (!is_numeric($covoiturageId)) {
+        $_SESSION['error_message'] = 'ID de trajet invalide';
+        header('Location: ../covoiturage');
+        exit;
+    }
+
+    $covoiturageId = (int)$covoiturageId;
+    $userId = $_SESSION['user_id'];
+
+    try {
+        $pdo->beginTransaction();
+        
+        // Vérifier que le covoiturage existe et est disponible
+        $stmt = $pdo->prepare("
+            SELECT c.*, 
+                   COUNT(p.participation_id) as places_occupees,
+                   u.pseudo as chauffeur_pseudo
+            FROM covoiturage c 
+            LEFT JOIN participation p ON c.covoiturage_id = p.covoiturage_id
+            LEFT JOIN utilisateur u ON c.utilisateur_id = u.utilisateur_id
+            WHERE c.covoiturage_id = ? 
+            AND c.statut = 'en_attente'
+            AND CONCAT(c.date_depart, ' ', c.heure_depart) > NOW()
+            GROUP BY c.covoiturage_id
+        ");
+        $stmt->execute([$covoiturageId]);
+        $covoiturage = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$covoiturage) {
+            throw new Exception('Ce trajet n\'est plus disponible ou n\'existe pas');
+        }
+        
+        // Vérifier que l'utilisateur n'est pas le chauffeur
+        if ($covoiturage['utilisateur_id'] == $userId) {
+            throw new Exception('Vous ne pouvez pas réserver votre propre trajet');
+        }
+        
+        // Vérifier qu'il reste des places
+        if ($covoiturage['places_occupees'] >= $covoiturage['nb_place']) {
+            throw new Exception('Ce trajet est complet');
+        }
+        
+        // Vérifier que l'utilisateur n'a pas déjà réservé ce trajet
+        $stmt = $pdo->prepare("
+            SELECT participation_id 
+            FROM participation 
+            WHERE covoiturage_id = ? AND utilisateur_id = ?
+        ");
+        $stmt->execute([$covoiturageId, $userId]);
+        if ($stmt->fetch()) {
+            throw new Exception('Vous avez déjà réservé ce trajet');
+        }
+        
+        // Vérifier que l'utilisateur a assez de crédits
+        $stmt = $pdo->prepare("SELECT credits FROM utilisateur WHERE utilisateur_id = ?");
+        $stmt->execute([$userId]);
+        $userCredits = $stmt->fetchColumn();
+
+        $prixTrajet = (int)$covoiturage['prix_personne'];
+
+        if ($userCredits < $prixTrajet) {
+        // Message d'erreur en français pour solde insuffisant
+        $_SESSION['error_message'] = ' Pour effectuer une réservation, veuillez recharger votre solde.';
+        // Redirection vers la même page de covoiturage avec les paramètres de recherche
+        header('Location: /covoiturage');
+        exit;
+        }
+        
+        // Débiter les crédits du passager
+        $stmt = $pdo->prepare("
+            UPDATE utilisateur 
+            SET credits = credits - ? 
+            WHERE utilisateur_id = ?
+        ");
+        $stmt->execute([$prixTrajet, $userId]);
+        
+        // Créer la participation
+        $stmt = $pdo->prepare("
+            INSERT INTO participation (covoiturage_id, utilisateur_id) 
+            VALUES (?, ?)
+        ");
+        $stmt->execute([$covoiturageId, $userId]);
+        
+        $pdo->commit();
+        
+        // Message de succès
+        $_SESSION['success_message'] = "Trajet réservé avec succès ! {$prixTrajet} crédits ont été débités de votre compte.";
+        
+        // Redirection vers la page des trajets passager
+        header('Location: ../trajets-passager');
+        exit;
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        
+        // Message d'erreur
+        $_SESSION['error_message'] = $e->getMessage();
+        header('Location: ../covoiturage');
+        exit;
+    }
+}
+
 // Récupérer l'utilisateur actuel (peut être NULL pour les non-autorisés)
 $current_user_id = $_SESSION['user_id'] ?? null;
 $user_role_string = $_SESSION['role'] ?? null;
@@ -135,10 +255,18 @@ function searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $
         // Traiter les notes et filtrer par note minimale
         foreach ($results as $key => &$covoiturage) {
             // Récupérer la note moyenne du chauffeur
-            $stmt = $pdo->prepare("SELECT AVG(note) as note_moyenne FROM avis WHERE utilisateur_id = ?");
-            $stmt->execute([$covoiturage['utilisateur_id']]);
-            $note = $stmt->fetch(PDO::FETCH_ASSOC);
-            $covoiturage['note_moyenne'] = round($note['note_moyenne'] ?: 0, 1);
+            $stmt = $pdo->prepare("
+            SELECT COALESCE(AVG(a.note), 0) as note_moyenne 
+            FROM avis a
+            JOIN participation p ON a.participation_id = p.participation_id
+            JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
+            WHERE c.utilisateur_id = ?
+        ");
+        $stmt->execute([$covoiturage['utilisateur_id']]);
+        $note_result = $stmt->fetchColumn();
+        $covoiturage['note_moyenne'] = round(floatval($note_result), 1);
+
+
             
             // Appliquer le filtre de note minimale
             if ($covoiturage['note_moyenne'] < $min_rating) {
