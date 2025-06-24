@@ -30,7 +30,6 @@ try {
     if (strpos($mongoUri, 'mongodb+srv') !== false || strpos($mongoUri, 'ssl=true') !== false) {
         $options = array_merge($options, [
             'tls' => true,
-            'tlsInsecure' => true,
             'tlsAllowInvalidCertificates' => true,
             'tlsAllowInvalidHostnames' => true,
             'authSource' => 'admin'
