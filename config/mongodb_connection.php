@@ -19,8 +19,21 @@ try {
                    'mongodb://localhost:27017';
     }
     
+    // Configuration des options SSL pour Heroku
+    $options = [];
+    
+    // Si c'est une connexion MongoDB Atlas (contient mongodb+srv)
+    if (strpos($mongoUri, 'mongodb+srv') !== false) {
+        $options = [
+            'ssl' => true,
+            'tls' => true,
+            'tlsAllowInvalidCertificates' => true,
+            'tlsAllowInvalidHostnames' => true
+        ];
+    }
+    
     // Création de la connexion à MongoDB
-    $mongodb = new MongoDB\Client($mongoUri);
+    $mongodb = new MongoDB\Client($mongoUri, $options);
     
     // Vérification de la connexion par ping
     $mongodb->admin->command(['ping' => 1]);

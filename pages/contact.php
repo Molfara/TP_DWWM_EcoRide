@@ -136,7 +136,3 @@ if ($mongodb !== null) {
     </div>
     <?php endif; ?>
 </div>
-
-<?php
-include_once '../public/footer.php';
-?>
