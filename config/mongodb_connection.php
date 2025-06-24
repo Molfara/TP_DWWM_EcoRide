@@ -6,15 +6,33 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $mongodb = null;
 
 try {
-    // Création d'une connexion à MongoDB
-    $mongodb = new MongoDB\Client("mongodb://localhost:27017");
+    // Détermine l'URI pour la connexion à MongoDB
+    // Priorité : variable d'environnement MONGODB_URI, puis MongoDB local
+    $mongoUri = getenv('MONGODB_URI') ?: 'mongodb://localhost:27017';
+    
+    // Pour Heroku, vérifier aussi d'autres variables possibles
+    if (!getenv('MONGODB_URI')) {
+        // Vérifier d'autres variables courantes pour MongoDB sur Heroku
+        $mongoUri = getenv('MONGO_URL') ?: 
+                   getenv('MONGOLAB_URI') ?: 
+                   getenv('MONGOHQ_URL') ?: 
+                   'mongodb://localhost:27017';
+    }
+    
+    // Création de la connexion à MongoDB
+    $mongodb = new MongoDB\Client($mongoUri);
     
     // Vérification de la connexion par ping
     $mongodb->admin->command(['ping' => 1]);
     
-    // S'il n'y a pas d'exception, la connexion est réussie
+    // Journalisation de la connexion réussie (seulement pour le débogage)
+    error_log("Connexion MongoDB réussie vers: " . $mongoUri);
+    
 } catch (Exception $e) {
     // Journalisation de l'erreur dans un fichier pour ne pas l'afficher à l'utilisateur
-    error_log("Erreur de connexion MongoDB: " . $e->getMessage(), 0);
+    error_log("Erreur de connexion MongoDB: " . $e->getMessage() . " | URI: " . ($mongoUri ?? 'undefined'), 0);
+    
+    // En cas d'erreur, on définit $mongodb à null
+    $mongodb = null;
 }
 ?>

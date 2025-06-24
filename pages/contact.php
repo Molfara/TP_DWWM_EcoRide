@@ -13,38 +13,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_review'])) {
     if (empty($name) || empty($comment)) {
         $error_message = "Tous les champs sont obligatoires.";
     } else {
-        try {
-            $collection = $mongodb->EcoRideReviews->reviews;
-            
-            $review = [
-                'name' => $name,
-                'comment' => $comment,
-                'date' => new MongoDB\BSON\UTCDateTime()
-            ];
-            
-            $result = $collection->insertOne($review);
-            
-            if ($result->getInsertedCount()) {
-                $success_message = "Merci pour votre avis !";
-                $name = "";
-                $comment = "";
-            } else {
-                $error_message = "Erreur lors de l'enregistrement de votre avis.";
+        // Vérifier que la connexion MongoDB est disponible
+        if ($mongodb === null) {
+            $error_message = "Erreur de connexion à la base de données.";
+        } else {
+            try {
+                // Utiliser la nouvelle façon d'accéder à la collection
+                $database = $mongodb->selectDatabase('EcoRideReviews');
+                $collection = $database->selectCollection('reviews');
+                
+                $review = [
+                    'name' => $name,
+                    'comment' => $comment,
+                    'date' => new MongoDB\BSON\UTCDateTime()
+                ];
+                
+                $result = $collection->insertOne($review);
+                
+                if ($result->getInsertedCount()) {
+                    $success_message = "Merci pour votre avis !";
+                    $name = "";
+                    $comment = "";
+                } else {
+                    $error_message = "Erreur lors de l'enregistrement de votre avis.";
+                }
+            } catch (Exception $e) {
+                $error_message = "Erreur de connexion à la base de données: " . $e->getMessage();
+                // Journaliser l'erreur pour le débogage
+                error_log("Erreur MongoDB dans contact.php: " . $e->getMessage());
             }
-        } catch (Exception $e) {
-            $error_message = "Erreur de connexion à la base de données: " . $e->getMessage();
         }
     }
 }
 
 // Récupération des avis
 $reviews = [];
-try {
-    $collection = $mongodb->EcoRideReviews->reviews;
-    $cursor = $collection->find([], ['sort' => ['date' => -1]]);
-    $reviews = $cursor->toArray();
-} catch (Exception $e) {
-    $error_message = "Erreur lors de la récupération des avis: " . $e->getMessage();
+if ($mongodb !== null) {
+    try {
+        $database = $mongodb->selectDatabase('EcoRideReviews');
+        $collection = $database->selectCollection('reviews');
+        $cursor = $collection->find([], ['sort' => ['date' => -1]]);
+        $reviews = $cursor->toArray();
+    } catch (Exception $e) {
+        $error_message = "Erreur lors de la récupération des avis: " . $e->getMessage();
+        error_log("Erreur récupération avis: " . $e->getMessage());
+    }
 }
 ?>
 
