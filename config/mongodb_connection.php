@@ -6,40 +6,55 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $mongodb = null;
 
 try {
-    // Récupération de l'URI MongoDB depuis les variables d'environnement
-    $mongoUri = getenv('MONGODB_URI') ?: getenv('MONGO_URL') ?: getenv('MONGOLAB_URI') ?: getenv('MONGOHQ_URL');
+    // Détermine l'URI pour la connexion à MongoDB
+    // Priorité : variable d'environnement MONGODB_URI, puis MongoDB local
+    $mongoUri = getenv('MONGODB_URI') ?: 'mongodb://localhost:27017';
     
-    // Si aucune URI n'est trouvée, utiliser une connexion locale pour le développement
-    if (!$mongoUri) {
-        $mongoUri = 'mongodb://localhost:27017';
-        error_log("Aucune URI MongoDB trouvée dans les variables d'environnement, utilisation de localhost");
+    // Pour Heroku, vérifier aussi d'autres variables possibles
+    if (!getenv('MONGODB_URI')) {
+        // Vérifier d'autres variables courantes pour MongoDB sur Heroku
+        $mongoUri = getenv('MONGO_URL') ?: 
+                   getenv('MONGOLAB_URI') ?: 
+                   getenv('MONGOHQ_URL') ?: 
+                   'mongodb://localhost:27017';
     }
     
-    // Configuration des options
+    // Configuration des options SSL pour Heroku
     $options = [
-        'connectTimeoutMS' => 10000,
+        'connectTimeoutMS' => 30000,
         'socketTimeoutMS' => 30000,
-        'serverSelectionTimeoutMS' => 10000,
+        'serverSelectionTimeoutMS' => 30000,
     ];
     
-    // Pour MongoDB Atlas, ajouter les options TLS
-    if (strpos($mongoUri, 'mongodb.net') !== false || strpos($mongoUri, 'mongodb+srv') !== false) {
-        $options['tls'] = true;
-        error_log("Configuration Atlas détectée");
+    // Si c'est une connexion MongoDB Atlas (contient mongodb+srv ou ssl=true)
+    if (strpos($mongoUri, 'mongodb+srv') !== false || strpos($mongoUri, 'ssl=true') !== false) {
+        $options = array_merge($options, [
+            'tls' => true,
+            'tlsInsecure' => true,
+            'tlsAllowInvalidCertificates' => true,
+            'tlsAllowInvalidHostnames' => true,
+            'authSource' => 'admin'
+        ]);
     }
     
-    error_log("Tentative de connexion MongoDB avec URI: " . preg_replace('/\/\/[^@]+@/', '//***:***@', $mongoUri));
+    // Journalisation de l'URI pour le débogage
+    error_log("Tentative de connexion MongoDB avec URI: " . $mongoUri);
     error_log("Options de connexion: " . json_encode($options));
     
     // Création de la connexion à MongoDB
     $mongodb = new MongoDB\Client($mongoUri, $options);
     
-    // Test de connexion
+    // Vérification de la connexion par ping
     $mongodb->admin->command(['ping' => 1]);
-    error_log("Connexion MongoDB réussie");
     
-} catch (\Exception $e) {
-    error_log("Erreur de connexion MongoDB: " . $e->getMessage());
+    // Journalisation de la connexion réussie (seulement pour le débogage)
+    error_log("Connexion MongoDB réussie vers: " . $mongoUri);
+    
+} catch (Exception $e) {
+    // Journalisation de l'erreur dans un fichier pour ne pas l'afficher à l'utilisateur
+    error_log("Erreur de connexion MongoDB: " . $e->getMessage() . " | URI: " . ($mongoUri ?? 'undefined'), 0);
+    
+    // En cas d'erreur, on définit $mongodb à null
     $mongodb = null;
 }
 ?>
