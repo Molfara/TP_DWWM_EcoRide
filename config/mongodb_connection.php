@@ -20,17 +20,26 @@ try {
     }
     
     // Configuration des options SSL pour Heroku
-    $options = [];
+    $options = [
+        'connectTimeoutMS' => 30000,
+        'socketTimeoutMS' => 30000,
+        'serverSelectionTimeoutMS' => 30000,
+    ];
     
-    // Si c'est une connexion MongoDB Atlas (contient mongodb+srv)
-    if (strpos($mongoUri, 'mongodb+srv') !== false) {
-        $options = [
-            'ssl' => true,
+    // Si c'est une connexion MongoDB Atlas (contient mongodb+srv ou ssl=true)
+    if (strpos($mongoUri, 'mongodb+srv') !== false || strpos($mongoUri, 'ssl=true') !== false) {
+        $options = array_merge($options, [
             'tls' => true,
+            'tlsInsecure' => true,
             'tlsAllowInvalidCertificates' => true,
-            'tlsAllowInvalidHostnames' => true
-        ];
+            'tlsAllowInvalidHostnames' => true,
+            'authSource' => 'admin'
+        ]);
     }
+    
+    // Journalisation de l'URI pour le débogage
+    error_log("Tentative de connexion MongoDB avec URI: " . $mongoUri);
+    error_log("Options de connexion: " . json_encode($options));
     
     // Création de la connexion à MongoDB
     $mongodb = new MongoDB\Client($mongoUri, $options);
