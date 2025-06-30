@@ -1995,6 +1995,7 @@ footer {
     justify-content: center;
     font-weight: bold;
     font-size: 18px;
+    margin-top: 10px;
 }
 
 
@@ -2560,10 +2561,88 @@ textarea.form-control {
 .driver-rating .rating-value {
     color: #333;
     font-size: 14px;
-    margin-left: 0; /* Убираем дополнительный отступ */
+    margin-left: 0; 
+}
+/* === STYLES POUR LES AVIS === */
+
+/* Секция с отзывами под driver-info */
+.reviews-section {
+    margin-top: 10px;
+    width: 100%;
 }
 
+/* Toggle кнопка */
+.reviews-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold !important;
+    margin-top: 15px;
+}
 
+.toggle-arrow {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Контейнер для отзывов */
+.reviews-container {
+    margin-top: 12px;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Отдельный отзыв */
+.review-item {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.review-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* Имя пользователя */
+.reviewer-name {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 6px;
+    margin-left: 5px;
+}
+
+/* Комментарий */
+.review-comment {
+    font-size: 16px;
+    color: #666;
+    font-style: italic;
+    background-color: #f8f9fa;
+    padding: 10px 12px;
+    border-radius: 6px;
+
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reviews-container {
+        max-height: 200px;
+    }
+    
+    .review-comment {
+        font-size: 16px;
+        padding: 8px 10px;
+    }
+    
+    .reviews-toggle {
+        font-size: 16px;
+    }
+}
 
 .alert.alert-danger {
     text-align: center;
@@ -2702,6 +2781,7 @@ textarea.form-control {
     flex-direction: column;
     gap: 8px;
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .chauffeur-avatar-container {
@@ -2728,4 +2808,5 @@ textarea.form-control {
     justify-content: center;
     font-weight: bold;
     font-size: 18px;
+    margin-bottom: 10px;
 }

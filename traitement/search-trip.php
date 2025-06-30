@@ -10,6 +10,31 @@ if (isset($_GET['action']) && $_GET['action'] === 'reserver' && isset($_GET['id'
 }
 
 /**
+ * Fonction pour récupérer les avis d'un chauffeur
+ */
+function getDriverReviews($pdo, $chauffeur_id) {
+    try {
+        $stmt = $pdo->prepare("
+            SELECT a.commentaire,
+                   u.pseudo, u.prenom, u.nom
+            FROM avis a
+            JOIN participation p ON a.participation_id = p.participation_id
+            JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
+            JOIN utilisateur u ON p.utilisateur_id = u.utilisateur_id
+            WHERE c.utilisateur_id = ?
+            AND a.commentaire IS NOT NULL
+            AND a.commentaire != ''
+            ORDER BY a.avis_id DESC
+            LIMIT 5
+        ");
+        $stmt->execute([$chauffeur_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
  * Fonction de gestion de la réservation
  */
 function handleReservation($pdo, $covoiturageId) {
@@ -266,7 +291,8 @@ function searchRides($pdo, $current_user_id, $current_user_role, $lieu_depart, $
         $note_result = $stmt->fetchColumn();
         $covoiturage['note_moyenne'] = round(floatval($note_result), 1);
 
-
+            // Récupérer les avis du chauffeur
+            $covoiturage['avis'] = getDriverReviews($pdo, $covoiturage['utilisateur_id']);
             
             // Appliquer le filtre de note minimale
             if ($covoiturage['note_moyenne'] < $min_rating) {

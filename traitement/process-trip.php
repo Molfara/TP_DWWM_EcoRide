@@ -20,6 +20,8 @@ if (!$action) {
 
 require_once __DIR__ . '/../config/database.php';
 
+require_once __DIR__ . '/payment-functions.php';
+
 try {
     switch ($action) {
         case 'start':
@@ -473,9 +475,12 @@ function handleFinishTrip($pdo, $tripId, $userId) {
             WHERE covoiturage_id = ?
         ");
         $stmt->execute([$gainsChauffeur, $commissionPlateforme, $paiementStatut, $tripId]);
-        
-        // NE PAS transférer les crédits maintenant - cela se fera plus tard selon la logique
-        
+
+        // PLANIFIER LE PAIEMENT DIFFÉRÉ (si statut = en_attente_timer)
+        if ($paiementStatut === 'en_attente_timer') {
+         scheduleDelayedPayment($pdo, $tripId, $userId, $gainsChauffeur);
+        }
+                
         $pdo->commit();
         
         echo json_encode([

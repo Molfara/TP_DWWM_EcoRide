@@ -277,6 +277,35 @@ unset($_SESSION['search_results'], $_SESSION['search_params'], $_SESSION['search
                     </div>
                 <?php endif; ?>
             </div>
+<!-- BLOC DES AVIS SOUS LES INFORMATIONS DU CONDUCTEUR -->
+<?php if (!$is_own_trip && !empty($covoiturage['avis'])): ?>
+                <div class="reviews-section">
+                    <div class="reviews-toggle" data-ride-id="<?php echo $covoiturage['covoiturage_id']; ?>">
+                        <span class="toggle-text">Voir les avis</span>
+                        <span class="toggle-arrow">▼</span>
+                    </div>
+                    
+                    <div class="reviews-container" id="reviews-<?php echo $covoiturage['covoiturage_id']; ?>" style="display: none;">
+                        <?php foreach ($covoiturage['avis'] as $avis): ?>
+                            <div class="review-item">
+                                <div class="reviewer-name">
+                                    <?php 
+                                    if (!empty($avis['prenom']) && !empty($avis['nom'])) {
+                                        echo htmlspecialchars($avis['prenom'] . ' ' . substr($avis['nom'], 0, 1) . '.');
+                                    } else {
+                                        echo htmlspecialchars($avis['pseudo']);
+                                    }
+                                    ?>
+                                </div>
+                                <div class="review-comment">
+                                    <?php echo htmlspecialchars($avis['commentaire']); ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
         </div>
         <div class="ride-price">
             <div class="price-amount"><?php echo number_format($covoiturage['prix_personne'], 2); ?> Credits</div>
@@ -473,4 +502,28 @@ document.addEventListener('DOMContentLoaded', function() {
         form.submit();
     });
 });
+
+// Gestion des avis
+document.querySelectorAll('.reviews-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const rideId = this.getAttribute('data-ride-id');
+            const reviewsContainer = document.getElementById('reviews-' + rideId);
+            const toggleText = this.querySelector('.toggle-text');
+            const toggleArrow = this.querySelector('.toggle-arrow');
+            
+            if (reviewsContainer.style.display === 'none') {
+                // Afficher les avis
+                reviewsContainer.style.display = 'block';
+                toggleText.textContent = 'Cacher les avis';
+                toggleArrow.textContent = '▲';
+                toggleArrow.classList.add('rotated');
+            } else {
+                // Cacher les avis
+                reviewsContainer.style.display = 'none';
+                toggleText.textContent = 'Voir les avis';
+                toggleArrow.textContent = '▼';
+                toggleArrow.classList.remove('rotated');
+            }
+        });
+    });
 </script>

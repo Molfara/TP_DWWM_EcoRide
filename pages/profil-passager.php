@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 require_once __DIR__ . '/../config/database.php';
 $userId = $_SESSION['user_id'];
 
-// Initialisation des variables de messages (ПЕРЕМЕЩЕНО В НАЧАЛО)
+// Initialisation des variables de messages 
 $message = '';
 $error = '';
 
