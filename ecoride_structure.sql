@@ -173,3 +173,18 @@ JOIN
 WHERE 
     v.energie IN ('électrique', 'hybride', 'hydrogène')
     AND c.statut = 'confirme';
+
+-- Table de paiement planifie
+CREATE TABLE paiement_planifie (
+    paiement_planifie_id INT AUTO_INCREMENT PRIMARY KEY,
+    covoiturage_id INT NOT NULL,
+    utilisateur_id INT NOT NULL,
+    montant DECIMAL(10,2) NOT NULL,
+    execute_at TIMESTAMP NOT NULL,
+    statut ENUM('en_attente', 'execute', 'annule') NOT NULL DEFAULT 'en_attente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_covoiturage_id (covoiturage_id),
+    INDEX idx_utilisateur_id (utilisateur_id),
+    INDEX idx_execute_at (execute_at),
+    INDEX idx_statut (statut)
+);

@@ -791,65 +791,6 @@ button[type="submit"]:hover {
 
 
 
-/* Style général du footer */
-footer {
-    display: flex; /* Affichage en ligne avec flexbox */
-    justify-content: space-between; /* Espacement entre les liens et la marque */
-    align-items: center; /* Alignement vertical des éléments */
-    padding: 10px 20px; /* Espacement interne */
-    background: #fff; /* Fond blanc */
-    border-top: 2px solid #ddd; /* Bordure grise en haut du footer */
-    margin-top: 30px; /* Espacement avec le contenu au-dessus */
-}
-
-/* Style pour les liens à gauche */
-.footer-links {
-    display: flex; /* Affichage en ligne des éléments */
-    gap: 20px; /* Espacement entre les liens */
-    padding: 0; /* Suppression du padding */
-    margin: 0; /* Suppression des marges */
-}
-
-/* Style des liens dans le footer */
-.footer-links a {
-    text-decoration: none; /* Suppression du soulignement */
-    color: #333; /* Couleur du texte */
-    font-weight: bold; /* Texte en gras */
-    transition: color 0.3s; /* Effet de transition sur la couleur */
-}
-
-/* Changement de couleur au survol des liens */
-.footer-links a:hover {
-    color: #007bff; /* Bleu lors du survol */
-}
-
-/* Style pour la section marque à droite */
-.footer-brand {
-    display: flex; /* Utilisation de flexbox */
-    flex-direction: column; /* Organisation en colonne */
-    align-items: flex-end; /* Alignement à droite */
-}
-
-/* Style pour la ligne avec emblème et nom */
-.footer-emblem {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Style de l'emblème */
-.footer-emblem img {
-    height: 40px; /* Hauteur de l'emblème */
-    width: auto;
-}
-
-/* Style du nom du service */
-.footer-name {
-    color: #333;
-    font-weight: bold;
-}
-
-
 /* Style pour le titre principal de la page */
 .page-title {
     text-align: center;
@@ -890,7 +831,6 @@ footer {
     line-height: 1.5;
     color: #6C7A89; /* Gris plus clair pour le texte */
 }   
-
 
 /* Style pour les icônes */
 .action-icon {
@@ -938,6 +878,10 @@ footer {
         width: 80% !important;
         margin: 15px auto !important;
     }
+}
+
+footer {
+    margin-top: auto !important;
 }
     
 /* Style général des boutons de rôle - Inchangé */
@@ -2565,13 +2509,12 @@ textarea.form-control {
 }
 /* === STYLES POUR LES AVIS === */
 
-/* Секция с отзывами под driver-info */
 .reviews-section {
     margin-top: 10px;
     width: 100%;
 }
 
-/* Toggle кнопка */
+/* Toggle bouton */
 .reviews-toggle {
     cursor: pointer;
     display: flex;
@@ -2588,7 +2531,6 @@ textarea.form-control {
     font-weight: bold;
 }
 
-/* Контейнер для отзывов */
 .reviews-container {
     margin-top: 12px;
     padding: 0;
@@ -2596,7 +2538,6 @@ textarea.form-control {
     overflow-y: auto;
 }
 
-/* Отдельный отзыв */
 .review-item {
     margin-bottom: 15px;
     padding-bottom: 15px;
@@ -2609,7 +2550,6 @@ textarea.form-control {
     border-bottom: none;
 }
 
-/* Имя пользователя */
 .reviewer-name {
     color: #666;
     font-size: 16px;
@@ -2617,7 +2557,6 @@ textarea.form-control {
     margin-left: 5px;
 }
 
-/* Комментарий */
 .review-comment {
     font-size: 16px;
     color: #666;
@@ -2810,3 +2749,131 @@ textarea.form-control {
     font-size: 18px;
     margin-bottom: 10px;
 }
+
+/* Style général du footer */
+footer {
+    display: flex; /* Affichage en ligne avec flexbox */
+    justify-content: space-between; /* Espacement entre les liens et la marque */
+    align-items: center; /* Alignement vertical des éléments */
+    padding: 10px 20px; /* Espacement interne */
+    background: #fff; /* Fond blanc */
+    border-top: 2px solid #ddd; /* Bordure grise en haut du footer */
+    margin-top: auto; /* Pousse le footer vers le bas */
+}
+
+/* Style pour les liens à gauche */
+.footer-links {
+    display: flex; /* Affichage en ligne des éléments */
+    gap: 20px; /* Espacement entre les liens */
+    padding: 0; /* Suppression du padding */
+    margin: 0; /* Suppression des marges */
+}
+
+/* Style des liens dans le footer */
+.footer-links a {
+    text-decoration: none; /* Suppression du soulignement */
+    color: #333; /* Couleur du texte */
+    font-weight: bold; /* Texte en gras */
+    transition: color 0.3s; /* Effet de transition sur la couleur */
+}
+
+/* Changement de couleur au survol des liens */
+.footer-links a:hover {
+    color: #007bff; /* Bleu lors du survol */
+}
+
+/* Style pour la section marque à droite */
+.footer-brand {
+    display: flex; /* Utilisation de flexbox */
+    flex-direction: column; /* Organisation en colonne */
+    align-items: flex-end; /* Alignement à droite */
+}
+/* Style pour la ligne avec emblème et nom */
+.footer-emblem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Style de l'emblème /
+.footer-emblem img {
+    height: 40px; / Hauteur de l'emblème */
+    width: auto;
+}
+
+/* Style du nom du service */
+.footer-name {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Structure pour sticky footer */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Wrapper pour tout le contenu sauf footer */
+.page-wrapper {
+    flex: 1;
+}
+
+/* Modifiez votre règle footer existante */
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: #fff;
+    border-top: 2px solid #ddd;
+    margin-top: auto; /* Changez de 30px à auto */
+}
+
+/* Gardez tous vos autres styles footer existants inchangés */
+.footer-links {
+    display: flex;
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #007bff;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.footer-emblem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-emblem img {
+    height: 40px;
+    width: auto;
+}
+
+.footer-name {
+    color: #333;
+    font-weight: bold;
+}
+
+

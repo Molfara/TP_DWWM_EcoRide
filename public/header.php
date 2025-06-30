@@ -107,7 +107,7 @@ if (isset($_SESSION['user_id'])) {
                 <?php elseif (isset($_SESSION['temp_role']) && $_SESSION['temp_role'] == 'chauffeur'): ?>
                 <!-- Menu pour chauffeur qui doit ajouter une voiture -->
                 <ul class="dropdown-menu user-menu">
-                    <li><a href="/role/passager">Je suis passager</a></li>
+                    <li><a href="/espace-passager">Je suis passager</a></li>
                     <li><a href="/role/chauffeur">Je suis chauffeur</a></li>
                     <li><a href="/deconnexion.php">Déconnecter</a></li>
                 </ul>
@@ -115,7 +115,7 @@ if (isset($_SESSION['user_id'])) {
                 <?php else: ?>
                 <!-- Menu par défaut (choix du rôle) -->
                 <ul class="dropdown-menu user-menu">
-                    <li><a href="/role/passager">Je suis passager</a></li>
+                    <li><a href="/espace-passager">Je suis passager</a></li>
                     <li><a href="/role/chauffeur">Je suis chauffeur</a></li>
                     <li><a href="/deconnexion.php">Déconnecter</a></li>
                 </ul>

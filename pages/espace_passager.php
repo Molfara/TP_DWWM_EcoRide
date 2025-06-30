@@ -67,7 +67,7 @@ try {
         <img src="/images/icons/search-icon.png" alt="Rechercher covoiturage">
         </div>
         <p class="action-text">Trouvez rapidement un trajet partagé adapté à votre itinéraire. Comparez les offres, choisissez votre covoitureur et voyagez en toute sérénité. Ensemble, réduisons notre empreinte carbone !</p>
-        <a href="recherche_covoiturage.php" class="role-button">Rechercher covoiturage</a>
+        <a href="covoiturage" class="role-button">Rechercher covoiturage</a>
     </div>
     
     <div class="action-block">
@@ -75,6 +75,6 @@ try {
             <img src="/images/icons/history-icon.png" alt="Regarder mes trajets">
         </div>
         <p class="action-text">Accédez à votre historique de trajets et vos réservations en un clic. Consultez les détails, gérez vos trajets et planifiez vos prochains déplacements. Chaque trajet partagé, c'est un geste pour la planète !</p>
-        <a href="mes_trajets.php" class="role-button">Regarder mes trajets</a>
+        <a href="trajets-passager" class="role-button">Regarder mes trajets</a>
     </div>
 </div>

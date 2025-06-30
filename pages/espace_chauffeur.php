@@ -65,14 +65,14 @@ try {
             <div class="action-block">
                 <p class="action-text">Publiez facilement votre trajet et trouvez des passagers en quelques clics. Optimisez vos déplacements, partagez les frais et contribuez à une mobilité plus durable.</p>
                 <div class="button-container">
-                    <a href="proposer_covoiturage.php" class="role-button">Proposer un covoiturage</a>
+                    <a href="proposer-trajet" class="role-button">Proposer un covoiturage</a>
                 </div>
             </div>
             
             <div class="action-block">
                 <p class="action-text">Retrouvez l'historique de vos trajets et vos réservations en un instant. Gérez vos covoiturages, suivez vos passagers et ajustez vos plans selon vos besoins.</p>
                 <div class="button-container">
-                    <a href="mes_trajets.php" class="role-button">Regarder mes trajets</a>
+                    <a href="trajets-chauffeur" class="role-button">Regarder mes trajets</a>
                 </div>
             </div>
         </div>
@@ -81,14 +81,14 @@ try {
             <div class="action-block">
                 <p class="action-text">Consultez vos gains et suivez l'évolution de votre solde en temps réel. Profitez de vos crédits pour vos futurs trajets ou transférez-les selon vos préférences.</p>
                 <div class="button-container">
-                    <a href="mes_credits.php" class="role-button">Vérifier mes crédits</a>
+                    <a href="profil-chauffeur" class="role-button">Vérifier mes crédits</a>
                 </div>
             </div>
             
             <div class="action-block">
                 <p class="action-text">Ajoutez et gérez plusieurs véhicules en toute simplicité. Indiquez les caractéristiques, la capacité et soyez prêt à proposer de nouveaux trajets en quelques secondes.</p>
                 <div class="button-container">
-                    <a href="gestion_vehicules.php" class="role-button">Ajouter une voiture</a>
+                    <a href="profil-chauffeur" class="role-button">Ajouter une voiture</a>
                 </div>
             </div>
         </div>
